@@ -92,9 +92,9 @@ def create_folder_by_username(username):
     oss('Creating complete')
 
 
-def initialize_telegram_bot():
+def initialize_telegram_bot(threads=1):
     tg('Start initialize telegram bot')
-    tgbot = telebot.TeleBot(TG_BOT_TOKEN, parse_mode='HTML')
+    tgbot = telebot.TeleBot(TG_BOT_TOKEN, parse_mode='HTML', num_threads=threads)
     tg('Telegram bot initialized')
     return tgbot
 
@@ -159,3 +159,13 @@ def check_instagram_account_validity(instagram_account):
     except Exception as e:
         err(e)
     return False
+
+
+class PseudoTelegramMessage:
+    def __init__(self, user_id):
+        self.id = user_id
+
+
+class PseudoTelegramChat:
+    def __init__(self, user_id):
+        self.chat = PseudoTelegramMessage(user_id)

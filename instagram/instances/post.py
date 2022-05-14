@@ -1,6 +1,6 @@
 from database.database import InstagramPost, add_instagram_post_to_instagram_subscription
-from functions.downloads import download_and_send_photo, download_and_send_video, download_and_send_album
-from misc import BColors, divider, create_folder_by_username, inst, err
+from instagram.downloads import download_and_send_photo, download_and_send_video, download_and_send_album
+from utils.misc import BColors, divider, create_folder_by_username, inst, err
 
 
 def grap_posts(bot, message, instagram_subscription, cl, amount=0):

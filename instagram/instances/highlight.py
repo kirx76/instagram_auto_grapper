@@ -1,6 +1,6 @@
 from database.database import InstagramHighlight, add_instagram_highlight_to_instagram_subscription
-from functions.downloads import download_and_send_highlight
-from misc import BColors, divider, create_folder_by_username, err, inst
+from instagram.downloads import download_and_send_highlight
+from utils.misc import BColors, divider, create_folder_by_username, err, inst
 
 
 def grap_highlights(bot, message, instagram_subscription, cl):

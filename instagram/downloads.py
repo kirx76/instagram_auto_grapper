@@ -2,7 +2,7 @@ import time
 
 from telebot.types import InputMediaPhoto
 
-from misc import collect_caption_to_send, err
+from utils.misc import collect_caption_to_send, err
 
 
 def download_and_send_photo(bot, media, message, username, cl):

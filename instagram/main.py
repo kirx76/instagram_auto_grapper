@@ -1,8 +1,8 @@
 from database.database import get_telegram_user_active_instagram_account
-from functions.highlight import get_new_highlights, grap_highlights
-from functions.post import get_new_posts, grap_posts
-from functions.story import get_new_stories, grap_stories
-from misc import initialize_valid_instagram_account, err, inst
+from instagram.instances.highlight import get_new_highlights, grap_highlights
+from instagram.instances.post import get_new_posts, grap_posts
+from instagram.instances.story import get_new_stories, grap_stories
+from utils.misc import initialize_valid_instagram_account, err, inst
 
 
 def get_media(bot, message, instagram_subscription, target):

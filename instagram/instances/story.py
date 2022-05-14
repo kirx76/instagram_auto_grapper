@@ -1,6 +1,6 @@
 from database.database import InstagramStory, add_instagram_story_to_instagram_subscription
-from functions.downloads import download_and_send_story
-from misc import BColors, divider, create_folder_by_username, inst, err
+from instagram.downloads import download_and_send_story
+from utils.misc import BColors, divider, create_folder_by_username, inst, err
 
 
 def grap_stories(bot, message, instagram_subscription, cl, amount=0):
