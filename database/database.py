@@ -1,9 +1,9 @@
 import datetime
 import os
 
-from playhouse.postgres_ext import PostgresqlExtDatabase
 from dotenv import load_dotenv
 from peewee import *
+from playhouse.postgres_ext import PostgresqlExtDatabase
 
 from utils.misc import dbm
 
@@ -25,10 +25,18 @@ def initialize_db():
     db.connect()
     dbm('Creating tables or initialization tables')
     db.create_tables(
-        [TelegramUser, TelegramUserStatus, InstagramAccount, InstagramSubscription, InstagramPost, InstagramHighlight,
-         InstagramStory])
+        [TelegramUser, TelegramUserStatus, InstagramUser,
+         InstagramAccount, InstagramSubscription, InstagramPost,
+         InstagramHighlight, InstagramStory])
     db.close()
     initialize_user_statuses()
+
+    # ia = InstagramAccount.select().first()
+    # cl = initialize_valid_instagram_account(ia)
+    # user_id = int(cl.user_id_from_username('karina.malafeevskaya'))
+    # med = cl.user_medias(user_id, 1)
+    # media = cl.media_info(med[0].pk)
+    # print(media.dict())
     dbm('Database initialization complete')
 
 
@@ -51,6 +59,15 @@ class BaseModel(Model):
 
 class TelegramUserStatus(BaseModel):
     name = CharField()
+
+
+class InstagramUser(BaseModel):
+    pk = TextField(unique=True, primary_key=True)
+    username = TextField(unique=True)
+    full_name = TextField(null=True)
+    profile_pic_url = TextField(null=True)
+    profile_pic_url_hd = TextField(null=True)
+    is_private = CharField(null=True)
 
 
 class TelegramUser(BaseModel):
@@ -97,6 +114,10 @@ class InstagramPost(BaseModel):
     taken_at = DateTimeField()
     created_at = DateTimeField(default=datetime.datetime.now)
     caption_text = TextField(null=True)
+    thumbnail_url = TextField()
+    media_type = IntegerField()
+    code = TextField()
+    user = ForeignKeyField(InstagramUser, backref='posts')
 
 
 class InstagramStory(BaseModel):
@@ -248,8 +269,30 @@ def get_enabled_instagram_subscriptions() -> list[InstagramSubscription]:
     return InstagramSubscription.select().where(InstagramSubscription.enabled == True).execute()
 
 
-def add_instagram_post_to_instagram_subscription(owner, pk, caption_text, taken_at) -> InstagramPost:
-    return InstagramPost(owner=owner, pk=pk, caption_text=caption_text, taken_at=taken_at).save()
+def add_instagram_post_to_instagram_subscription(owner, post: InstagramPost) -> InstagramPost:
+    create_or_get_instagram_user(post.user)
+    created_post, created = InstagramPost.get_or_create(
+        owner=owner,
+        pk=post.pk,
+        taken_at=post.taken_at,
+        caption_text=post.caption_text,
+        thumbnail_url=post.thumbnail_url,
+        media_type=post.media_type,
+        code=post.code,
+        user=post.user.pk,
+    )
+    return created_post
+
+
+def create_or_get_instagram_user(instagram_user):
+    return InstagramUser.get_or_create(
+        pk=instagram_user.pk,
+        username=instagram_user.username,
+        full_name=instagram_user.full_name,
+        profile_pic_url=instagram_user.profile_pic_url,
+        profile_pic_url_hd=instagram_user.profile_pic_url_hd,
+        is_private=instagram_user.is_private,
+    )
 
 
 def add_instagram_story_to_instagram_subscription(owner, pk, caption_text, taken_at) -> InstagramStory:

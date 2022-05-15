@@ -33,7 +33,7 @@ def download_post(bot, post, message, instagram_subscription, cl):
     if post.media_type == 8:
         sent = download_and_send_album(bot, post, message, instagram_subscription.username, cl)
     if sent:
-        add_instagram_post_to_instagram_subscription(instagram_subscription, post.pk, post.caption_text, post.taken_at)
+        add_instagram_post_to_instagram_subscription(instagram_subscription, post)
 
 
 def get_posts_list(username, instagram_client):
