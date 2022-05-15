@@ -1,6 +1,7 @@
 import datetime
 import os
 
+from playhouse.postgres_ext import PostgresqlExtDatabase
 from dotenv import load_dotenv
 from peewee import *
 
@@ -8,9 +9,15 @@ from utils.misc import dbm
 
 load_dotenv()
 
-PEEWEE_DB_PATH = os.environ.get("PEEWEE_DB_PATH")
+PG_APP_NAME = os.environ.get("PG_APP_NAME")
+PG_USER = os.environ.get("PG_USER")
+PG_USER_PASSWORD = os.environ.get("PG_USER_PASSWORD")
+PG_HOST = os.environ.get("PG_HOST")
+PG_PORT = os.environ.get("PG_PORT")
 
-db = SqliteDatabase(PEEWEE_DB_PATH)
+db = PostgresqlExtDatabase(PG_APP_NAME, user=PG_USER, password=PG_USER_PASSWORD, host=PG_HOST, port=PG_PORT,
+                           autocommit=True,
+                           thread_safe=True)
 
 
 def initialize_db():
@@ -35,7 +42,7 @@ def initialize_user_statuses():
 
 class BaseModel(Model):
     class Meta:
-        database = SqliteDatabase(PEEWEE_DB_PATH)
+        database = db
 
     def save_if_not_exists(self):
         self.save()

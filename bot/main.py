@@ -55,6 +55,9 @@ class AdminFilter(SimpleCustomFilter):
 
     def check(self, initiator):
         telegram_user = get_current_telegram_user(get_chat_id_from_initiator(initiator))
+        if telegram_user is None:
+            return False
+
         if telegram_user.status.name == 'Admin':
             return True
         else:
@@ -66,6 +69,9 @@ class UsualFilter(SimpleCustomFilter):
 
     def check(self, initiator):
         telegram_user = get_current_telegram_user(get_chat_id_from_initiator(initiator))
+        if telegram_user is None:
+            return False
+
         if telegram_user.status.name == 'Usual':
             return True
         else:
@@ -77,6 +83,9 @@ class NormalFilter(SimpleCustomFilter):
 
     def check(self, initiator):
         telegram_user = get_current_telegram_user(get_chat_id_from_initiator(initiator))
+        if telegram_user is None:
+            return False
+
         if telegram_user.status.name == 'Normal':
             return True
         else:
@@ -88,6 +97,9 @@ class VIPFilter(SimpleCustomFilter):
 
     def check(self, initiator):
         telegram_user = get_current_telegram_user(get_chat_id_from_initiator(initiator))
+        if telegram_user is None:
+            return False
+
         if telegram_user.status.name == 'VIP':
             return True
         else:
@@ -99,6 +111,9 @@ class BannedFilter(SimpleCustomFilter):
 
     def check(self, initiator):
         telegram_user = get_current_telegram_user(get_chat_id_from_initiator(initiator))
+        if telegram_user is None:
+            return False
+
         if telegram_user.status.name == 'banned':
             return True
         else:
