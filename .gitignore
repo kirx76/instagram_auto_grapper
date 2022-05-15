@@ -1,9 +1,9 @@
 .idea
 venv
-/tmp/*
 /database/main.db
 .env
 /downloads/*
 !/downloads/README.md
 /dumps/*
 !/dumps/README.md
+/docker/docker.env

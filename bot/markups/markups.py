@@ -1,4 +1,4 @@
-from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 
 from database.database import get_instagram_accounts_by_telegram_user_id, get_telegram_user_instagram_subscriptions, \
     get_current_telegram_user
@@ -11,6 +11,9 @@ def main_menu_markup():
     markup = InlineKeyboardMarkup()
     markup.add(InlineKeyboardButton("Instagram accounts", callback_data='user_instagram_accounts'))
     markup.add(InlineKeyboardButton("Instagram subscriptions", callback_data='user_instagram_subscriptions'))
+    # TODO WEB APPLICATION INITIALIZATION
+    # markup.add(
+    #     InlineKeyboardButton(text='hui', web_app=WebAppInfo(url="https://github.com/aiogram/aiogram/issues/891")))
     return markup
 
 
