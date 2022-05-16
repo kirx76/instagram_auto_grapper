@@ -132,14 +132,20 @@ def create_or_get_instagram_user(instagram_user: InstagramUser, telegram_user: T
 def add_resource_to_instagram_post(resource: InstagramPostResource,
                                    created_post: InstagramPost) -> InstagramPostResource:
     dbm('Adding resources to created instagram post')
-    created_resource, created = InstagramPostResource.get_or_create(
-        pk=resource.pk,
-        video_url=resource.video_url,
-        thumbnail_url=resource.thumbnail_url,
-        media_type=resource.media_type,
-        post=created_post.id,
-    )
-    return created_resource
+    exists_resource = InstagramPostResource.get_or_none(InstagramPostResource.pk == resource.pk)
+    if exists_resource is None:
+        created_resource, created = InstagramPostResource.get_or_create(
+            pk=resource.pk,
+            video_url=resource.video_url,
+            thumbnail_url=resource.thumbnail_url,
+            media_type=resource.media_type,
+            post=created_post.id,
+        )
+        dbm(f'Created instagram resource with pk:{resource.pk} for {created_post.id}')
+        return created_resource
+    else:
+        dbm(f'Instagram resource with pk:{resource.pk} for {created_post.id} already exists')
+        return exists_resource
 
 
 def add_instagram_story_to_instagram_user(story: InstagramStory, telegram_user_id) -> InstagramStory:
