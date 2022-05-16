@@ -1,7 +1,7 @@
-from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from database.database import get_instagram_accounts_by_telegram_user_id, get_telegram_user_instagram_subscriptions, \
-    get_current_telegram_user
+from database.get import get_current_telegram_user, get_instagram_accounts_by_telegram_user_id, \
+    get_telegram_user_instagram_users
 
 TEXTS = {
 }
@@ -10,7 +10,7 @@ TEXTS = {
 def main_menu_markup():
     markup = InlineKeyboardMarkup()
     markup.add(InlineKeyboardButton("Instagram accounts", callback_data='user_instagram_accounts'))
-    markup.add(InlineKeyboardButton("Instagram subscriptions", callback_data='user_instagram_subscriptions'))
+    markup.add(InlineKeyboardButton("Instagram users", callback_data='user_instagram_users'))
     # TODO WEB APPLICATION INITIALIZATION
     # markup.add(
     #     InlineKeyboardButton(text='hui', web_app=WebAppInfo(url="https://github.com/aiogram/aiogram/issues/891")))
@@ -44,32 +44,32 @@ def user_selected_instagram_account_markup(instagram_account):
     return markup
 
 
-def user_instagram_subscriptions_markup(telegram_user):
-    telegram_user_instagram_subscriptions = get_telegram_user_instagram_subscriptions(telegram_user)
+def user_instagram_users_markup(telegram_user):
+    telegram_user_instagram_users = get_telegram_user_instagram_users(telegram_user)
     markup = InlineKeyboardMarkup()
-    markup.add(InlineKeyboardButton('Add instagram subscription', callback_data='user_add_instagram_subscription'))
-    for subscription in telegram_user_instagram_subscriptions:
-        markup.add(InlineKeyboardButton(subscription.username,
-                                        callback_data=f'user_select_instagram_subscription:{subscription.username}'))
+    markup.add(InlineKeyboardButton('Add instagram user', callback_data='user_add_instagram_user'))
+    for user in telegram_user_instagram_users:
+        markup.add(InlineKeyboardButton(user.username,
+                                        callback_data=f'user_select_instagram_user:{user.username}'))
     markup.add(InlineKeyboardButton("Menu", callback_data='user_main_menu'))
     return markup
 
 
-def user_selected_instagram_subscription_markup(instagram_subscription):
+def user_selected_instagram_user_markup(instagram_user):
     markup = InlineKeyboardMarkup()
-    posts_count = instagram_subscription.posts.select().count()
-    stories_count = instagram_subscription.stories.select().count()
-    highlights_count = instagram_subscription.highlights.select().count()
-    if instagram_subscription.enabled:
-        markup.add(InlineKeyboardButton("Turn off", callback_data='user_instagram_subscription:deactivate'))
+    posts_count = instagram_user.posts.select().count()
+    stories_count = instagram_user.stories.select().count()
+    highlights_count = instagram_user.highlights.select().count()
+    if instagram_user.enabled:
+        markup.add(InlineKeyboardButton("Turn off", callback_data='user_instagram_user:deactivate'))
     else:
-        markup.add(InlineKeyboardButton("Turn on", callback_data='user_instagram_subscription:activate'))
+        markup.add(InlineKeyboardButton("Turn on", callback_data='user_instagram_user:activate'))
     markup.add(
         InlineKeyboardButton(f"Posts: {posts_count}",
-                             callback_data='user_instagram_subscription_get:posts'),
+                             callback_data='user_instagram_user_get:posts'),
         InlineKeyboardButton(f"Stories: {stories_count}",
-                             callback_data='user_instagram_subscription_get:stories'),
+                             callback_data='user_instagram_user_get:stories'),
         InlineKeyboardButton(f"Highlights: {highlights_count}",
-                             callback_data='user_instagram_subscription_get:highlights'))
-    markup.add(InlineKeyboardButton("Subscriptions menu", callback_data='user_instagram_subscriptions'))
+                             callback_data='user_instagram_user_get:highlights'))
+    markup.add(InlineKeyboardButton("Instagram users menu", callback_data='user_instagram_users'))
     return markup
