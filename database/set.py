@@ -176,7 +176,7 @@ def add_instagram_highlight_to_instagram_user(highlight, telegram_user_id) -> In
     create_or_get_instagram_user(highlight.user, telegram_user)
     exists_highlight = InstagramHighlight.get_or_none(InstagramHighlight.pk == highlight.pk)
     if exists_highlight is None:
-        created_highlight, created = InstagramStory.get_or_create(
+        created_highlight, created = InstagramHighlight.get_or_create(
             pk=highlight.pk,
             code=highlight.code,
             taken_at=highlight.taken_at,
