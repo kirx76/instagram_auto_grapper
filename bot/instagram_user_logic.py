@@ -47,6 +47,7 @@ def user_instagram_user_get(call: CallbackQuery, bot: TeleBot):
 
 # Default next step handlers
 def instagram_process_add_user_instagram_user(message: Message, call: CallbackQuery, bot: TeleBot):
+    bot.edit_message_text('Wait for check instagram user info', call.message.chat.id, call.message.message_id)
     target_username = get_username_from_url(message.text)
     bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
     add_instagram_user(target_username, call.message.chat.id)

@@ -88,21 +88,26 @@ def toggle_selected_active_instagram_user(user_id):
 def add_instagram_post_to_instagram_user(post: InstagramPost, telegram_user_id) -> InstagramPost:
     telegram_user = get_current_telegram_user(telegram_user_id)
     create_or_get_instagram_user(post.user, telegram_user)
-    dbm('Creating post to instagram user')
-    created_post, created = InstagramPost.get_or_create(
-        pk=post.pk,
-        code=post.code,
-        taken_at=post.taken_at,
-        media_type=post.media_type,
-        thumbnail_url=post.thumbnail_url,
-        user=post.user.pk,
-        caption_text=caption_text_to_db(post),
-    )
-    if post.media_type == 8:
-        dbm('Post is a album. Creating post resources')
-        for resource in post.resources:
-            add_resource_to_instagram_post(resource, created_post)
-    return created_post
+    exists_post = InstagramPost.get_or_none(InstagramPost.pk == post.pk)
+    if exists_post is None:
+        created_post, created = InstagramPost.get_or_create(
+            pk=post.pk,
+            code=post.code,
+            taken_at=post.taken_at,
+            media_type=post.media_type,
+            thumbnail_url=post.thumbnail_url,
+            user=post.user.pk,
+            caption_text=caption_text_to_db(post),
+        )
+        if post.media_type == 8:
+            dbm('Post is a album. Creating post resources')
+            for resource in post.resources:
+                add_resource_to_instagram_post(resource, created_post)
+            dbm(f'Created instagram post with pk:{post.pk} for {post.user.username}')
+        return created_post
+    else:
+        dbm(f'Instagram post with pk:{post.pk} for {post.user.username} already exists')
+        return exists_post
 
 
 def create_or_get_instagram_user(instagram_user: InstagramUser, telegram_user: TelegramUser) -> InstagramUser:
@@ -140,43 +145,47 @@ def add_resource_to_instagram_post(resource: InstagramPostResource,
 def add_instagram_story_to_instagram_user(story: InstagramStory, telegram_user_id) -> InstagramStory:
     telegram_user = get_current_telegram_user(telegram_user_id)
     create_or_get_instagram_user(story.user, telegram_user)
-    created_story, created = InstagramStory.get_or_create(
-        pk=story.pk,
-        code=story.code,
-        taken_at=story.taken_at,
-        media_type=story.media_type,
-        thumbnail_url=story.thumbnail_url,
-        video_url=story.video_url,
-        video_duration=story.video_duration,
-        user=story.user.pk,
-        caption_text=caption_text_to_db(story),
-    )
-    if created:
+    exists_story = InstagramStory.get_or_none(InstagramStory.pk == story.pk)
+    if exists_story is None:
+        created_story, created = InstagramStory.get_or_create(
+            pk=story.pk,
+            code=story.code,
+            taken_at=story.taken_at,
+            media_type=story.media_type,
+            thumbnail_url=story.thumbnail_url,
+            video_url=story.video_url,
+            video_duration=story.video_duration,
+            user=story.user.pk,
+            caption_text=caption_text_to_db(story),
+        )
         dbm(f'Created instagram story with pk:{story.pk} for {story.user.username}')
+        return created_story
     else:
         dbm(f'Instagram story with pk:{story.pk} for {story.user.username} already exists')
-    return created_story
+        return exists_story
 
 
 def add_instagram_highlight_to_instagram_user(highlight, telegram_user_id) -> InstagramHighlight:
     telegram_user = get_current_telegram_user(telegram_user_id)
     create_or_get_instagram_user(highlight.user, telegram_user)
-    created_highlight, created = InstagramStory.get_or_create(
-        pk=highlight.pk,
-        code=highlight.code,
-        taken_at=highlight.taken_at,
-        media_type=highlight.media_type,
-        thumbnail_url=highlight.thumbnail_url,
-        video_url=highlight.video_url,
-        video_duration=highlight.video_duration,
-        user=highlight.user.pk,
-        caption_text=caption_text_to_db(highlight),
-    )
-    if created:
+    exists_highlight = InstagramHighlight.get_or_none(InstagramHighlight.pk == highlight.pk)
+    if exists_highlight is None:
+        created_highlight, created = InstagramStory.get_or_create(
+            pk=highlight.pk,
+            code=highlight.code,
+            taken_at=highlight.taken_at,
+            media_type=highlight.media_type,
+            thumbnail_url=highlight.thumbnail_url,
+            video_url=highlight.video_url,
+            video_duration=highlight.video_duration,
+            user=highlight.user.pk,
+            caption_text=caption_text_to_db(highlight),
+        )
         dbm(f'Created instagram highlight with pk:{highlight.pk} for {highlight.user.username}')
+        return created_highlight
     else:
         dbm(f'Instagram highlight with pk:{highlight.pk} for {highlight.user.username} already exists')
-    return created_highlight
+        return exists_highlight
 
 
 def update_instagram_user_active_instagram_account_by_id(instagram_account_id, state):
