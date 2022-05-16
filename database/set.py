@@ -152,9 +152,9 @@ def add_instagram_story_to_instagram_user(story: InstagramStory, telegram_user_i
         caption_text=caption_text_to_db(story),
     )
     if created:
-        dbm(f'Created instagram story with pk:{story.pr} for {story.user.username}')
+        dbm(f'Created instagram story with pk:{story.pk} for {story.user.username}')
     else:
-        dbm(f'Instagram story with pk:{story.pr} for {story.user.username} already exists')
+        dbm(f'Instagram story with pk:{story.pk} for {story.user.username} already exists')
     return created_story
 
 
@@ -173,9 +173,9 @@ def add_instagram_highlight_to_instagram_user(highlight, telegram_user_id) -> In
         caption_text=caption_text_to_db(highlight),
     )
     if created:
-        dbm(f'Created instagram highlight with pk:{highlight.pr} for {highlight.user.username}')
+        dbm(f'Created instagram highlight with pk:{highlight.pk} for {highlight.user.username}')
     else:
-        dbm(f'Instagram highlight with pk:{highlight.pr} for {highlight.user.username} already exists')
+        dbm(f'Instagram highlight with pk:{highlight.pk} for {highlight.user.username} already exists')
     return created_highlight
 
 
