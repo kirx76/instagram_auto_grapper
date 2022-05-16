@@ -6,11 +6,12 @@ from bot.admin_logic import admin_instagram_accounts, admin_select_instagram_acc
 from bot.instagram_account_logic import user_add_instagram_account, user_instagram_accounts, \
     user_select_instagram_account, user_instagram_account_change_active, user_instagram_account_check_status, \
     user_delete_instagram_account
-from bot.instagram_subscription_logic import user_instagram_subscriptions, user_add_instagram_subscription, \
-    user_select_instagram_subscription, user_instagram_subscription_change_active, user_instagram_subscription_get
+from bot.instagram_user_logic import user_instagram_users, user_add_instagram_user, \
+    user_select_instagram_user, user_instagram_user_change_active, user_instagram_user_get
 from bot.main import send_start, user_main_menu, antispam_func, AdminFilter, main_scheduler, DownloadingFilter, \
     BannedFilter, UsualFilter, NormalFilter, VIPFilter
-from database.database import initialize_db, clean_all_instagram_account_works
+from database.database import initialize_db
+from database.set import clean_all_instagram_account_works
 from utils.misc import initialize_telegram_bot
 
 initialize_db()
@@ -45,21 +46,21 @@ def register_instagram_account_handlers():
                                         pass_bot=True)
 
 
-def register_instagram_subscription_handlers():
-    bot.register_callback_query_handler(user_instagram_subscriptions, banned=False,
-                                        func=lambda call: call.data == 'user_instagram_subscriptions', pass_bot=True)
-    bot.register_callback_query_handler(user_add_instagram_subscription,
+def register_instagram_user_handlers():
+    bot.register_callback_query_handler(user_instagram_users, banned=False,
+                                        func=lambda call: call.data == 'user_instagram_users', pass_bot=True)
+    bot.register_callback_query_handler(user_add_instagram_user,
                                         downloading=False, banned=False,
-                                        func=lambda call: call.data == 'user_add_instagram_subscription', pass_bot=True)
-    bot.register_callback_query_handler(user_select_instagram_subscription, banned=False,
-                                        func=lambda call: 'user_select_instagram_subscription:' in call.data,
+                                        func=lambda call: call.data == 'user_add_instagram_user', pass_bot=True)
+    bot.register_callback_query_handler(user_select_instagram_user, banned=False,
+                                        func=lambda call: 'user_select_instagram_user:' in call.data,
                                         pass_bot=True)
-    bot.register_callback_query_handler(user_instagram_subscription_change_active,
+    bot.register_callback_query_handler(user_instagram_user_change_active,
                                         downloading=False, banned=False,
-                                        func=lambda call: 'user_instagram_subscription:' in call.data, pass_bot=True)
-    bot.register_callback_query_handler(user_instagram_subscription_get, banned=False,
+                                        func=lambda call: 'user_instagram_user:' in call.data, pass_bot=True)
+    bot.register_callback_query_handler(user_instagram_user_get, banned=False,
                                         downloading=False,
-                                        func=lambda call: 'user_instagram_subscription_get:' in call.data,
+                                        func=lambda call: 'user_instagram_user_get:' in call.data,
                                         pass_bot=True)
 
 
@@ -98,7 +99,7 @@ def register_grapper_thread():
 
 
 register_instagram_account_handlers()
-register_instagram_subscription_handlers()
+register_instagram_user_handlers()
 register_main_handlers()
 register_admin_handlers()
 register_middlewares()

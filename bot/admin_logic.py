@@ -2,8 +2,8 @@ from telebot import TeleBot
 from telebot.types import CallbackQuery
 
 from bot.markups.admin_markups import admin_instagram_accounts_markup, admin_selected_instagram_account_markup
-from database.database import select_instagram_account, get_selected_instagram_account, \
-    restore_selected_instagram_account
+from database.get import select_instagram_account
+from database.set import restore_selected_instagram_account
 
 
 def admin_instagram_accounts(call: CallbackQuery, bot: TeleBot):

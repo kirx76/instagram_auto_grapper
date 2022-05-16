@@ -99,6 +99,13 @@ def initialize_telegram_bot(threads=1):
     return tgbot
 
 
+def caption_text_to_db(media):
+    text = ''
+    if hasattr(media, 'caption_text'):
+        text = media.caption_text
+    return text
+
+
 def collect_caption_to_send(media, username):
     text = f'username: #{username}'
     if hasattr(media, 'taken_at'):
