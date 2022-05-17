@@ -104,7 +104,7 @@ register_main_handlers()
 register_admin_handlers()
 register_middlewares()
 register_custom_filters()
-register_grapper_thread()
+# register_grapper_thread()
 
 
 def run():
