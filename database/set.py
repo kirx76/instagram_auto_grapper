@@ -10,13 +10,19 @@ from utils.misc import dbm, initialize_valid_instagram_account, caption_text_to_
     create_folder_by_username
 
 
-def add_instagram_user(username, user_id) -> InstagramUser:
+def add_instagram_user(username, user_id, bot, telegram_user_id) -> InstagramUser:
     telegram_user = get_current_telegram_user(user_id)
     active_instagram_account = get_active_instagram_account_by_telegram_user_id(user_id)
-    instagram_account = initialize_valid_instagram_account(active_instagram_account)
+    instagram_account = initialize_valid_instagram_account(active_instagram_account, bot, telegram_user_id)
     instagram_user_info = instagram_account.user_info_by_username(username)
     dbm('Adding instagram account')
     return create_or_get_instagram_user(instagram_user_info, telegram_user)
+
+
+def set_instagram_verification_code_by_username(username, verification_code):
+    InstagramAccount.update({
+        verification_code: verification_code
+    }).where(InstagramAccount.username == username).execute()
 
 
 def delete_selected_instagram_account(user_id):

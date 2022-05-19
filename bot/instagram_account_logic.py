@@ -48,7 +48,7 @@ def user_instagram_account_change_active(call: CallbackQuery, bot: TeleBot):
 
 def user_instagram_account_check_status(call: CallbackQuery, bot: TeleBot):
     selected = get_selected_instagram_account(call.from_user.id)
-    is_valid = check_instagram_account_validity(selected)
+    is_valid = check_instagram_account_validity(selected, bot, call.message.chat.id)
     updated = set_selected_instagram_account_validity(call.from_user.id, is_valid)
     bot.edit_message_text(
         f'Selected {updated.username}\n'

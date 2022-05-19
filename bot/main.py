@@ -165,21 +165,22 @@ def main_scheduler_thread(bot: TeleBot):
         if instagram_user_active_instagram_account is None:
             err(f"Instagram user {user.username} don't have active Instagram account")
             return
-        if instagram_user_active_instagram_account.downloading_now:
-            bot.send_message(telegram_user.user_id,
-                             f'Your instagram account {instagram_user_active_instagram_account.username} '
-                             f'currently have a work, wait for it')
-            return
-        instagram_client = initialize_valid_instagram_account(instagram_user_active_instagram_account)
-        update_instagram_user_active_instagram_account_by_id(instagram_user_active_instagram_account.id, True)
+        # if instagram_user_active_instagram_account.downloading_now:
+        #     bot.send_message(telegram_user.user_id,
+        #                      f'Your instagram account {instagram_user_active_instagram_account.username} '
+        #                      f'currently have a work, wait for it')
+        #     return
+        instagram_client = initialize_valid_instagram_account(instagram_user_active_instagram_account, bot, telegram_user.user_id)
+        # update_instagram_user_active_instagram_account_by_id(instagram_user_active_instagram_account.id, True)
         downloader(user, instagram_client, bot, telegram_user)
-        update_instagram_user_active_instagram_account_by_id(instagram_user_active_instagram_account.id, False)
+        # update_instagram_user_active_instagram_account_by_id(instagram_user_active_instagram_account.id, False)
     pass
 
 
 def downloader(instagram_user, instagram_client, bot, telegram_user):
-    new_stories = get_new_stories(instagram_user, instagram_client)
     message = PseudoTelegramChat(telegram_user.user_id)
+
+    new_stories = get_new_stories(instagram_user, instagram_client)
     if len(new_stories) > 0:
         bot.send_message(telegram_user.user_id,
                          f'User {instagram_user.username} have {len(new_stories)} new stories')

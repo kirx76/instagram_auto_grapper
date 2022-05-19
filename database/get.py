@@ -8,6 +8,11 @@ def get_telegram_user_by_instagram_user_username(username) -> TelegramUser:
         InstagramUser.username == username).first()
 
 
+def get_instagram_account_by_username(username) -> InstagramAccount:
+    dbm('Getting instagram account user by username')
+    return InstagramAccount.select().where(InstagramAccount.username == username).first()
+
+
 def get_telegram_user_by_instagram_account_username(username) -> TelegramUser:
     return TelegramUser.select().join(InstagramAccount).where(
         InstagramAccount.username == username).first()

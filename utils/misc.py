@@ -1,6 +1,7 @@
 import os
 import re
 import shutil
+import time
 from urllib.parse import urlparse
 
 import boto3
@@ -141,8 +142,8 @@ def collect_caption_to_send(media, username):
     return text
 
 
-def initialize_valid_instagram_account(instagram_account):
-    is_valid = check_instagram_account_validity(instagram_account)
+def initialize_valid_instagram_account(instagram_account, bot, telegram_user_id):
+    is_valid = check_instagram_account_validity(instagram_account, bot, telegram_user_id)
     if is_valid:
         cl = Client()
         cl.load_settings(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json')
@@ -154,23 +155,43 @@ def initialize_valid_instagram_account(instagram_account):
     return cl
 
 
-def check_instagram_account_validity(instagram_account):
+code = ''
+attempts = 0
+
+
+def check_instagram_account_validity(instagram_account, bot, telegram_user_id):
+    global code, attempts
     inst(f'Start checking instagram account {instagram_account.username}')
+    code = instagram_account.verification_code
+
+    def process_challenge_code_handler(message, username):
+        global code
+        code = message.text
+        bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+
+    def challenge_code_handler(username, choice):
+        global code, attempts
+        if attempts > 3:
+            err('ATTEMPTS TO VERIFY LARGER THAN 3')
+            raise SystemExit('ATTEMPTS TO VERIFY LARGER THAN 3')
+        if code is None:
+            while True:
+                attempts += 1
+                msg = bot.send_message(telegram_user_id,
+                                       'You have 1 minute to write your verification code in next message')
+                bot.register_next_step_handler(msg, process_challenge_code_handler, username)
+                time.sleep(60)
+                bot.delete_message(chat_id=msg.chat.id, message_id=msg.message_id)
+                bot.send_message(telegram_user_id, 'Wait for check')
+                if code and code.isdigit():
+                    break
+            return code
+        else:
+            return code
+
     try:
         cl = Client()
-
-        # def process_challenge_code(message, bot):
-        #     print(message.text)
-        #     return message.text
-        #
-        # def challenge_code_handler(username, choice):
-        #     bot = initialize_telegram_bot(1)
-        #     telegram_user = get_telegram_user_by_instagram_account_username(username)
-        #     message = PseudoTelegramChat(telegram_user.user_id)
-        #     msg = bot.send_message(message.chat.id, 'Write ur code in next message')
-        #     bot.register_next_step_handler(msg, process_challenge_code, bot)
-        #     print(username, choice, bot)
-        # cl.challenge_code_handler = challenge_code_handler
+        cl.challenge_code_handler = challenge_code_handler
         if not os.path.exists(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json'):
             oss('Dump does not exists')
             cl.login(instagram_account.username, instagram_account.password, False)
@@ -188,13 +209,13 @@ def check_instagram_account_validity(instagram_account):
             err(e)
             if os.path.exists(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json'):
                 os.remove(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json')
-                return check_instagram_account_validity(instagram_account)
+                return check_instagram_account_validity(instagram_account, bot, telegram_user_id)
             return False
         except LoginRequired as e:
             err(e)
             if os.path.exists(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json'):
                 os.remove(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json')
-                return check_instagram_account_validity(instagram_account)
+                return check_instagram_account_validity(instagram_account, bot, telegram_user_id)
             return False
         except Exception as e:
             err(e)

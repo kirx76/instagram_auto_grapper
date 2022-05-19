@@ -9,7 +9,7 @@ def get_media(bot, message, instagram_user, target):
     try:
         inst(f'Current target: {instagram_user.username}')
         active_instagram_account = get_telegram_user_active_instagram_account(message.chat.id)
-        valid_instagram_account = initialize_valid_instagram_account(active_instagram_account)
+        valid_instagram_account = initialize_valid_instagram_account(active_instagram_account, bot, message.chat.id)
 
         if target == 'posts':
             new_posts = get_new_posts(instagram_user, valid_instagram_account)
