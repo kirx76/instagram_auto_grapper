@@ -8,6 +8,11 @@ def get_telegram_user_by_instagram_user_username(username) -> TelegramUser:
         InstagramUser.username == username).first()
 
 
+def get_telegram_user_by_instagram_account_username(username) -> TelegramUser:
+    return TelegramUser.select().join(InstagramAccount).where(
+        InstagramAccount.username == username).first()
+
+
 def get_active_instagram_account_by_telegram_user_id(user_id) -> InstagramAccount:
     dbm('Getting active instagram account for telegram user')
     return InstagramAccount.select().join(TelegramUser).where(
@@ -26,6 +31,11 @@ def get_active_instagram_account_by_instagram_user(instagram_user) -> InstagramA
 def get_all_instagram_accounts_for_admin() -> list[InstagramAccount]:
     dbm('Get all instagram accounts for admin')
     return InstagramAccount.select().execute()
+
+
+def get_all_instagram_users_for_admin() -> list[InstagramUser]:
+    dbm('Get all instagram users for admin')
+    return InstagramUser.select().execute()
 
 
 def get_enabled_instagram_users() -> list[InstagramUser]:

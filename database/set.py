@@ -1,10 +1,13 @@
 import datetime
 
+import requests
+
 from database.database import InstagramAccount, InstagramStory, InstagramPostResource, InstagramPost, InstagramUser, \
     TelegramUser, InstagramHighlight
 from database.get import get_current_telegram_user, get_selected_instagram_user, get_selected_instagram_account, \
     get_active_instagram_account_by_telegram_user_id
-from utils.misc import dbm, initialize_valid_instagram_account, caption_text_to_db
+from utils.misc import dbm, initialize_valid_instagram_account, caption_text_to_db, AWS, \
+    create_folder_by_username
 
 
 def add_instagram_user(username, user_id) -> InstagramUser:
@@ -113,6 +116,16 @@ def add_instagram_post_to_instagram_user(post: InstagramPost, telegram_user_id) 
 def create_or_get_instagram_user(instagram_user: InstagramUser, telegram_user: TelegramUser) -> InstagramUser:
     exists_instagram_user = InstagramUser.get_or_none(InstagramUser.pk == instagram_user.pk)
     if exists_instagram_user is None:
+        s3 = AWS()
+        profile_path = create_folder_by_username(instagram_user.username)
+
+        profile_pic = requests.get(
+            instagram_user.profile_pic_url_hd if instagram_user.profile_pic_url_hd is not None else instagram_user.profile_pic_url,
+            allow_redirects=True)
+        open(f'{profile_path}/{instagram_user.pk}_profile_pic.jpg', 'wb').write(profile_pic.content)
+        pic_location = s3.upload_file(f'{profile_path}/{instagram_user.pk}_profile_pic.jpg',
+                                      f'{instagram_user.pk}_profile_pic.jpg')
+
         created_user, created = InstagramUser.get_or_create(
             pk=instagram_user.pk,
             username=instagram_user.username,
@@ -120,7 +133,8 @@ def create_or_get_instagram_user(instagram_user: InstagramUser, telegram_user: T
             profile_pic_url=instagram_user.profile_pic_url,
             profile_pic_url_hd=instagram_user.profile_pic_url_hd,
             is_private=instagram_user.is_private,
-            added_by=telegram_user.id
+            added_by=telegram_user.id,
+            profile_pic_location=pic_location,
         )
         dbm(f'Instagram user {instagram_user.username} added by {telegram_user.username}')
         return created_user

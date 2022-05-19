@@ -3,6 +3,7 @@ import re
 import shutil
 from urllib.parse import urlparse
 
+import boto3
 import telebot
 from dotenv import load_dotenv
 from instagrapi import Client
@@ -12,6 +13,11 @@ load_dotenv()
 
 TG_BOT_TOKEN = os.environ.get("TG_BOT_TOKEN")
 IG_DUMP_FOLDER_PATH = os.environ.get("IG_DUMP_FOLDER_PATH")
+BOTO3_ACCESS_KEY = os.environ.get("BOTO3_ACCESS_KEY")
+BOTO3_SECRET_KEY = os.environ.get("BOTO3_SECRET_KEY")
+BOTO3_SESSION_TOKEN = os.environ.get("BOTO3_SESSION_TOKEN")
+BOTO3_BUCKET_NAME = os.environ.get("BOTO3_BUCKET_NAME")
+BOTO3_ENDPOINT_URL = os.environ.get("BOTO3_ENDPOINT_URL")
 
 
 class BColors:
@@ -90,6 +96,23 @@ def create_folder_by_username(username):
     oss('Creating new folder')
     os.mkdir(f'./downloads/{username}')
     oss('Creating complete')
+    return f'./downloads/{username}'
+
+
+class AWS:
+    def __init__(self):
+        self.session = boto3.session.Session(
+            aws_access_key_id=BOTO3_ACCESS_KEY,
+            aws_secret_access_key=BOTO3_SECRET_KEY,
+        )
+        self.client = self.session.client(
+            service_name='s3',
+            endpoint_url=BOTO3_ENDPOINT_URL
+        )
+
+    def upload_file(self, file_path: str, file_name: str):
+        self.client.upload_file(file_path, BOTO3_BUCKET_NAME, file_name)
+        return f'{BOTO3_ENDPOINT_URL}/{BOTO3_BUCKET_NAME}/{file_name}'
 
 
 def initialize_telegram_bot(threads=1):
@@ -135,6 +158,19 @@ def check_instagram_account_validity(instagram_account):
     inst(f'Start checking instagram account {instagram_account.username}')
     try:
         cl = Client()
+
+        # def process_challenge_code(message, bot):
+        #     print(message.text)
+        #     return message.text
+        #
+        # def challenge_code_handler(username, choice):
+        #     bot = initialize_telegram_bot(1)
+        #     telegram_user = get_telegram_user_by_instagram_account_username(username)
+        #     message = PseudoTelegramChat(telegram_user.user_id)
+        #     msg = bot.send_message(message.chat.id, 'Write ur code in next message')
+        #     bot.register_next_step_handler(msg, process_challenge_code, bot)
+        #     print(username, choice, bot)
+        # cl.challenge_code_handler = challenge_code_handler
         if not os.path.exists(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json'):
             oss('Dump does not exists')
             cl.login(instagram_account.username, instagram_account.password, False)

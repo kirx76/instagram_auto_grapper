@@ -97,6 +97,7 @@ class InstagramUser(BaseModel):
     is_private = CharField(null=True)
     enabled = BooleanField(default=False)
     added_by = ForeignKeyField(TelegramUser, backref='instagram_users')
+    profile_pic_location = TextField(null=True)
 
 
 class InstagramPost(BaseModel):
