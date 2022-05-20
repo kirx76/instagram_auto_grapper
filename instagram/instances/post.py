@@ -47,15 +47,7 @@ def get_posts_list(username, instagram_client):
 
 
 def get_new_posts(instagram_user, instagram_client):
-    last_post = instagram_user.posts.select().where(InstagramPost.user_id == instagram_user.pk).order_by(
-        InstagramPost.id.desc()).first()
     posts = get_posts_list(instagram_user.username, instagram_client)
-    if last_post:
-        try:
-            index = posts.index(int(last_post.pk))
-            return posts[:index]
-        except Exception as e:
-            err(e)
-            return posts
-    else:
-        return posts
+    instagram_user_posts = InstagramPost.select(InstagramPost.pk).execute()
+    instagram_user_posts_filtered = [int(post.pk) for post in instagram_user_posts]
+    return list(set(posts) - set(instagram_user_posts_filtered))

@@ -41,15 +41,7 @@ def get_stories_list(username, instagram_client):
 
 
 def get_new_stories(instagram_user, instagram_client):
-    last_story = instagram_user.stories.select().where(InstagramStory.user_id == instagram_user.pk).order_by(
-        InstagramStory.id.desc()).first()
     stories = get_stories_list(instagram_user.username, instagram_client)
-    if last_story:
-        try:
-            index = stories.index(int(last_story.pk))
-            return stories[:index]
-        except Exception as e:
-            err(e)
-            return stories
-    else:
-        return stories
+    instagram_user_stories = InstagramStory.select(InstagramStory.pk).execute()
+    instagram_user_stories_filtered = [int(story.pk) for story in instagram_user_stories]
+    return list(set(stories) - set(instagram_user_stories_filtered))

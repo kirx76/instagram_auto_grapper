@@ -43,15 +43,7 @@ def get_highlights_list(username, instagram_client):
 
 
 def get_new_highlights(instagram_user, instagram_client):
-    last_highlight = instagram_user.highlights.select().where(InstagramHighlight.user_id == instagram_user.pk).order_by(
-        InstagramHighlight.id.desc()).first()
     highlights = get_highlights_list(instagram_user.username, instagram_client)
-    if last_highlight:
-        try:
-            index = highlights.index(int(last_highlight.pk))
-            return highlights[:index]
-        except Exception as e:
-            err(e)
-            return highlights
-    else:
-        return highlights
+    instagram_user_highlights = InstagramHighlight.select(InstagramHighlight.pk).execute()
+    instagram_user_highlights_filtered = [int(highlight.pk) for highlight in instagram_user_highlights]
+    return list(set(highlights) - set(instagram_user_highlights_filtered))
