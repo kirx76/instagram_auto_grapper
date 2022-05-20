@@ -10,7 +10,7 @@ from utils.misc import get_username_from_url
 
 def user_instagram_users(call: CallbackQuery, bot: TeleBot):
     bot.edit_message_text('Your instagram users', call.message.chat.id, call.message.message_id,
-                          reply_markup=user_instagram_users_markup(call.message.chat.id))
+                          reply_markup=user_instagram_users_markup(call.message.chat.id, 1))
 
 
 def user_add_instagram_user(call: CallbackQuery, bot: TeleBot):
@@ -37,12 +37,8 @@ def user_instagram_user_change_active(call: CallbackQuery, bot: TeleBot):
 def user_instagram_user_get(call: CallbackQuery, bot: TeleBot):
     target_for_get = call.data.partition('user_instagram_user_get:')[2]
     target_instagram_user = get_selected_instagram_user(call.message.chat.id)
-    msg = bot.edit_message_text(f'Start collecting', call.message.chat.id, call.message.message_id)
+    bot.edit_message_text(f'Start collecting', call.message.chat.id, call.message.message_id)
     get_media(bot, call.message, target_instagram_user, target_for_get)
-    bot.delete_message(chat_id=msg.chat.id, message_id=msg.message_id)
-    bot.send_message(call.message.chat.id,
-                     f'Collection complete\n\nSelected: {target_instagram_user.username}',
-                     reply_markup=user_selected_instagram_user_markup(target_instagram_user))
 
 
 # Default next step handlers
@@ -52,4 +48,4 @@ def instagram_process_add_user_instagram_user(message: Message, call: CallbackQu
     bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
     add_instagram_user(target_username, call.message.chat.id, bot, call.message.chat.id)
     bot.edit_message_text('Your instagram users', call.message.chat.id, call.message.message_id,
-                          reply_markup=user_instagram_users_markup(call.message.chat.id))
+                          reply_markup=user_instagram_users_markup(call.message.chat.id, 1))

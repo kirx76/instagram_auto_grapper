@@ -1,8 +1,8 @@
-from logging import Formatter, FileHandler, getLogger, DEBUG
 import os
 import re
 import shutil
 import time
+from logging import Formatter, FileHandler, getLogger, DEBUG
 from urllib.parse import urlparse
 
 import boto3
@@ -101,8 +101,11 @@ def divider():
 
 def cleanup_downloaded_file_by_filepath(path):
     oss('Remove file by filepath')
-    if os.path.exists(path):
-        os.remove(path)
+    try:
+        if os.path.exists(path):
+            os.remove(path)
+    except Exception as e:
+        err(e)
 
 
 def cleanup_folder_by_username(username):
@@ -110,7 +113,6 @@ def cleanup_folder_by_username(username):
     try:
         shutil.rmtree(f'./downloads/{username}')
     except OSError as e:
-        logger.exception('exception')
         err(f'{e.filename} - {e.strerror}')
 
 
@@ -166,6 +168,7 @@ def collect_caption_to_send(media, username):
 
 
 def initialize_valid_instagram_account(instagram_account, bot, telegram_user_id):
+    # TODO ADD PROXIES
     is_valid = check_instagram_account_validity(instagram_account, bot, telegram_user_id)
     if is_valid:
         cl = Client()
@@ -214,7 +217,7 @@ def check_instagram_account_validity(instagram_account, bot, telegram_user_id):
         cl.challenge_code_handler = challenge_code_handler
         if not os.path.exists(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json'):
             oss('Dump does not exists')
-            cl.login(instagram_account.username, instagram_account.password, False)
+            cl.login(instagram_account.username, instagram_account.password, True)
         else:
             oss('Dump founded, trying load with this')
             cl.load_settings(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json')
@@ -226,25 +229,21 @@ def check_instagram_account_validity(instagram_account, bot, telegram_user_id):
             inst('Login done')
             return True
         except ClientLoginRequired as e:
-            logger.exception('exception')
             err(e)
             if os.path.exists(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json'):
                 os.remove(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json')
                 return check_instagram_account_validity(instagram_account, bot, telegram_user_id)
             return False
         except LoginRequired as e:
-            logger.exception('exception')
             err(e)
             if os.path.exists(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json'):
                 os.remove(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json')
                 return check_instagram_account_validity(instagram_account, bot, telegram_user_id)
             return False
         except Exception as e:
-            logger.exception('exception')
             err(e)
             return False
     except Exception as e:
-        logger.exception('exception')
         err(e)
     return False
 

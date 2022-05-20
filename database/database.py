@@ -65,6 +65,9 @@ class TelegramUser(BaseModel):
     selected_instagram_user = CharField(null=True)
     status = ForeignKeyField(TelegramUserStatus, backref='user_status', default=1)
 
+    # TODO ADD DOWNLOADING STATUS FOR THREAD (TO OFF DOWNLOADS IF NOT NEEDED)
+    # downloading_enabled = BooleanField(default=True)
+
     def save(self, *args, **kwargs):
         self.last_action_time = datetime.datetime.now()
         return super(TelegramUser, self).save(*args, **kwargs)

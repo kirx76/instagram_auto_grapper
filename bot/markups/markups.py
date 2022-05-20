@@ -1,7 +1,10 @@
-from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
+import math
+
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+from telegram_bot_pagination import InlineKeyboardPaginator
 
 from database.get import get_current_telegram_user, get_instagram_accounts_by_telegram_user_id, \
-    get_telegram_user_instagram_users
+    get_telegram_user_instagram_users, get_telegram_user_instagram_users_paginated
 
 TEXTS = {
 }
@@ -44,15 +47,23 @@ def user_selected_instagram_account_markup(instagram_account):
     return markup
 
 
-def user_instagram_users_markup(telegram_user):
-    telegram_user_instagram_users = get_telegram_user_instagram_users(telegram_user)
-    markup = InlineKeyboardMarkup()
-    markup.add(InlineKeyboardButton('Add instagram user', callback_data='user_add_instagram_user'))
+def user_instagram_users_markup(telegram_user, page):
+    telegram_user_instagram_users_all = get_telegram_user_instagram_users(telegram_user)
+    telegram_user_instagram_users = get_telegram_user_instagram_users_paginated(telegram_user, page)
+    paginator = InlineKeyboardPaginator(
+        math.ceil(len(telegram_user_instagram_users_all) / 5),
+        current_page=page,
+        data_pattern='user_instagram_user_page:{page}'
+    )
     for user in telegram_user_instagram_users:
-        markup.add(InlineKeyboardButton(user.username,
-                                        callback_data=f'user_select_instagram_user:{user.username}'))
-    markup.add(InlineKeyboardButton("Menu", callback_data='user_main_menu'))
-    return markup
+        paginator.add_before(
+            InlineKeyboardButton(user.username,
+                                 callback_data=f'user_select_instagram_user:{user.username}')
+        )
+
+    paginator.add_after(InlineKeyboardButton('Add instagram user', callback_data='user_add_instagram_user'),
+                        InlineKeyboardButton("Menu", callback_data='user_main_menu'))
+    return paginator.markup
 
 
 def user_selected_instagram_user_markup(instagram_user):

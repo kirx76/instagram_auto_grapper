@@ -9,7 +9,7 @@ from bot.instagram_account_logic import user_add_instagram_account, user_instagr
 from bot.instagram_user_logic import user_instagram_users, user_add_instagram_user, \
     user_select_instagram_user, user_instagram_user_change_active, user_instagram_user_get
 from bot.main import send_start, user_main_menu, antispam_func, AdminFilter, main_scheduler, DownloadingFilter, \
-    BannedFilter, UsualFilter, NormalFilter, VIPFilter
+    BannedFilter, UsualFilter, NormalFilter, VIPFilter, characters_page_callback
 from database.database import initialize_db
 from database.set import clean_all_instagram_account_works
 from utils.misc import initialize_telegram_bot
@@ -52,16 +52,17 @@ def register_instagram_user_handlers():
     bot.register_callback_query_handler(user_add_instagram_user,
                                         downloading=False, banned=False,
                                         func=lambda call: call.data == 'user_add_instagram_user', pass_bot=True)
-    bot.register_callback_query_handler(user_select_instagram_user, banned=False,
+    bot.register_callback_query_handler(user_select_instagram_user, banned=False, downloading=False,
                                         func=lambda call: 'user_select_instagram_user:' in call.data,
                                         pass_bot=True)
     bot.register_callback_query_handler(user_instagram_user_change_active,
                                         downloading=False, banned=False,
                                         func=lambda call: 'user_instagram_user:' in call.data, pass_bot=True)
-    bot.register_callback_query_handler(user_instagram_user_get, banned=False,
-                                        downloading=False,
+    bot.register_callback_query_handler(user_instagram_user_get, banned=False, downloading=False,
                                         func=lambda call: 'user_instagram_user_get:' in call.data,
                                         pass_bot=True)
+    bot.register_callback_query_handler(characters_page_callback, banned=False, downloading=False,
+                                        func=lambda call: 'user_instagram_user_page:' in call.data, pass_bot=True)
 
 
 def register_admin_handlers():

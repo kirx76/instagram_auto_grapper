@@ -55,6 +55,13 @@ def get_telegram_user_active_instagram_account(user_id) -> InstagramAccount:
         (InstagramAccount.added_by == telegram_user.id) & (InstagramAccount.is_active == True)).first()
 
 
+def get_telegram_user_instagram_users_paginated(user_id, page) -> list[InstagramUser]:
+    telegram_user = get_current_telegram_user(user_id)
+    dbm('Getting telegram user instagram users')
+    return InstagramUser.select().where(InstagramUser.added_by == telegram_user.id).order_by(InstagramUser.pk).paginate(
+        page, 5).execute()
+
+
 def get_telegram_user_instagram_users(user_id) -> list[InstagramUser]:
     telegram_user = get_current_telegram_user(user_id)
     dbm('Getting telegram user instagram users')

@@ -1,3 +1,4 @@
+import threading
 import time
 
 from apscheduler.schedulers.blocking import BlockingScheduler
@@ -5,7 +6,7 @@ from telebot import TeleBot
 from telebot.custom_filters import SimpleCustomFilter
 from telebot.types import Message, CallbackQuery
 
-from bot.markups.markups import main_menu_markup
+from bot.markups.markups import main_menu_markup, user_instagram_users_markup
 from database.get import get_current_telegram_user, get_telegram_user_active_instagram_account, \
     get_enabled_instagram_users, get_telegram_user_by_instagram_user_username, \
     get_active_instagram_account_by_instagram_user
@@ -24,6 +25,12 @@ def send_start(message: Message, bot: TeleBot):
 def user_main_menu(call: CallbackQuery, bot: TeleBot):
     bot.edit_message_text('Main menu', call.message.chat.id, call.message.message_id,
                           reply_markup=main_menu_markup())
+
+
+def characters_page_callback(call, bot):
+    page = call.data.partition('user_instagram_user_page:')[2]
+    bot.edit_message_text('Your instagram users', call.message.chat.id, call.message.message_id,
+                          reply_markup=user_instagram_users_markup(call.message.chat.id, int(page)))
 
 
 # MIDDLEWARES
@@ -165,34 +172,57 @@ def main_scheduler_thread(bot: TeleBot):
         if instagram_user_active_instagram_account is None:
             err(f"Instagram user {user.username} don't have active Instagram account")
             return
-        # if instagram_user_active_instagram_account.downloading_now:
-        #     bot.send_message(telegram_user.user_id,
-        #                      f'Your instagram account {instagram_user_active_instagram_account.username} '
-        #                      f'currently have a work, wait for it')
-        #     return
-        instagram_client = initialize_valid_instagram_account(instagram_user_active_instagram_account, bot, telegram_user.user_id)
-        # update_instagram_user_active_instagram_account_by_id(instagram_user_active_instagram_account.id, True)
+        if instagram_user_active_instagram_account.downloading_now:
+            bot.send_message(telegram_user.user_id,
+                             f'Your instagram account {instagram_user_active_instagram_account.username} '
+                             f'currently have a work, wait for it')
+            return
+        instagram_client = initialize_valid_instagram_account(instagram_user_active_instagram_account, bot,
+                                                              telegram_user.user_id)
         downloader(user, instagram_client, bot, telegram_user)
-        # update_instagram_user_active_instagram_account_by_id(instagram_user_active_instagram_account.id, False)
 
 
 def downloader(instagram_user, instagram_client, bot, telegram_user):
+    # TODO ADD MULTIPLE INSTAGRAM ACCOUNTS DOWNLOADING
     message = PseudoTelegramChat(telegram_user.user_id)
 
-    new_stories = get_new_stories(instagram_user, instagram_client)
-    if len(new_stories) > 0:
-        bot.send_message(telegram_user.user_id,
-                         f'User {instagram_user.username} have {len(new_stories)} new stories')
-        grap_stories(bot, message, instagram_user, instagram_client, amount=len(new_stories))
+    instagram_user_active_instagram_account = get_active_instagram_account_by_instagram_user(instagram_user)
+    if instagram_user_active_instagram_account.downloading_now:
+        bot.send_message(message.chat.id, f'Your instagram account {instagram_user_active_instagram_account.username} '
+                                          f'currently have a work, wait for it')
+        return
+    try:
+        update_instagram_user_active_instagram_account_by_id(instagram_user_active_instagram_account.id, True)
+        new_stories = get_new_stories(instagram_user, instagram_client)
+        if len(new_stories) > 0:
+            bot.send_message(telegram_user.user_id,
+                             f'User {instagram_user.username} have {len(new_stories)} new stories')
+            default_downloader_thread_starter(grap_stories, bot, message, instagram_user, instagram_client,
+                                              amount=len(new_stories))
 
-    new_posts = get_new_posts(instagram_user, instagram_client)
-    if len(new_posts) > 0:
-        bot.send_message(telegram_user.user_id,
-                         f'User {instagram_user.username} have {len(new_posts)} new posts')
-        grap_posts(bot, message, instagram_user, instagram_client, amount=len(new_posts))
+        new_posts = get_new_posts(instagram_user, instagram_client)
+        if len(new_posts) > 0:
+            bot.send_message(telegram_user.user_id,
+                             f'User {instagram_user.username} have {len(new_posts)} new posts')
+            default_downloader_thread_starter(grap_posts, bot, message, instagram_user, instagram_client,
+                                              amount=len(new_posts))
 
-    new_highlights = get_new_highlights(instagram_user, instagram_client)
-    if len(new_highlights) > 0:
-        bot.send_message(telegram_user.user_id,
-                         f'User {instagram_user.username} have {len(new_highlights)} new highlights')
-        grap_highlights(bot, message, instagram_user, instagram_client)
+        new_highlights = get_new_highlights(instagram_user, instagram_client)
+        if len(new_highlights) > 0:
+            bot.send_message(telegram_user.user_id,
+                             f'User {instagram_user.username} have {len(new_highlights)} new highlights')
+            default_downloader_thread_starter(grap_highlights, bot, message, instagram_user,
+                                              instagram_client)
+    except Exception as e:
+        err(e)
+        bot.send_message(message.chat.id, e)
+        update_instagram_user_active_instagram_account_by_id(instagram_user_active_instagram_account.id, False)
+
+
+def default_downloader_thread_starter(func, bot, message, instagram_user, valid_instagram_account, amount=None):
+    try:
+        default_downloader_thread = threading.Thread(target=func, args=(
+            bot, message, instagram_user, valid_instagram_account, amount,))
+        default_downloader_thread.start()
+    except Exception as e:
+        err(e)
