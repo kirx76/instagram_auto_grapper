@@ -41,7 +41,8 @@ def get_stories_list(username, instagram_client):
 
 
 def get_new_stories(instagram_user, instagram_client):
-    last_story = instagram_user.stories.select().order_by(InstagramStory.id.desc()).first()
+    last_story = instagram_user.stories.select().where(InstagramStory.user_id == instagram_user.pk).order_by(
+        InstagramStory.id.desc()).first()
     stories = get_stories_list(instagram_user.username, instagram_client)
     if last_story:
         try:

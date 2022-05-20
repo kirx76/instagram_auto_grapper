@@ -43,7 +43,8 @@ def get_highlights_list(username, instagram_client):
 
 
 def get_new_highlights(instagram_user, instagram_client):
-    last_highlight = instagram_user.highlights.select().order_by(InstagramHighlight.id.desc()).first()
+    last_highlight = instagram_user.highlights.select().where(InstagramHighlight.user_id == instagram_user.pk).order_by(
+        InstagramHighlight.id.desc()).first()
     highlights = get_highlights_list(instagram_user.username, instagram_client)
     if last_highlight:
         try:

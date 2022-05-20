@@ -47,7 +47,8 @@ def get_posts_list(username, instagram_client):
 
 
 def get_new_posts(instagram_user, instagram_client):
-    last_post = instagram_user.posts.select().order_by(InstagramPost.id.desc()).first()
+    last_post = instagram_user.posts.select().where(InstagramPost.user_id == instagram_user.pk).order_by(
+        InstagramPost.id.desc()).first()
     posts = get_posts_list(instagram_user.username, instagram_client)
     if last_post:
         try:

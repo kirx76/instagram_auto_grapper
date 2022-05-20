@@ -174,7 +174,6 @@ def main_scheduler_thread(bot: TeleBot):
         # update_instagram_user_active_instagram_account_by_id(instagram_user_active_instagram_account.id, True)
         downloader(user, instagram_client, bot, telegram_user)
         # update_instagram_user_active_instagram_account_by_id(instagram_user_active_instagram_account.id, False)
-    pass
 
 
 def downloader(instagram_user, instagram_client, bot, telegram_user):
