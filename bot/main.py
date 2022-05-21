@@ -172,11 +172,11 @@ def main_scheduler_thread(bot: TeleBot):
         if instagram_user_active_instagram_account is None:
             err(f"Instagram user {user.username} don't have active Instagram account")
             return
-        if instagram_user_active_instagram_account.downloading_now:
-            bot.send_message(telegram_user.user_id,
-                             f'Your instagram account {instagram_user_active_instagram_account.username} '
-                             f'currently have a work, wait for it')
-            return
+        # if instagram_user_active_instagram_account.downloading_now:
+        #     bot.send_message(telegram_user.user_id,
+        #                      f'Your instagram account {instagram_user_active_instagram_account.username} '
+        #                      f'currently have a work, wait for it')
+        #     return
         instagram_client = initialize_valid_instagram_account(instagram_user_active_instagram_account, bot,
                                                               telegram_user.user_id)
         downloader(user, instagram_client, bot, telegram_user)
@@ -187,10 +187,10 @@ def downloader(instagram_user, instagram_client, bot, telegram_user):
     message = PseudoTelegramChat(telegram_user.user_id)
 
     instagram_user_active_instagram_account = get_active_instagram_account_by_instagram_user(instagram_user)
-    if instagram_user_active_instagram_account.downloading_now:
-        bot.send_message(message.chat.id, f'Your instagram account {instagram_user_active_instagram_account.username} '
-                                          f'currently have a work, wait for it')
-        return
+    # if instagram_user_active_instagram_account.downloading_now:
+    #     bot.send_message(message.chat.id, f'Your instagram account {instagram_user_active_instagram_account.username} '
+    #                                       f'currently have a work, wait for it')
+    #     return
     try:
         update_instagram_user_active_instagram_account_by_id(instagram_user_active_instagram_account.id, True)
         new_stories = get_new_stories(instagram_user, instagram_client)

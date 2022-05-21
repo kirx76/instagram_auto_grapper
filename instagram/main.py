@@ -9,10 +9,10 @@ from utils.misc import initialize_valid_instagram_account, err, inst
 
 def get_media(bot, message, instagram_user, target):
     instagram_user_active_instagram_account = get_active_instagram_account_by_instagram_user(instagram_user)
-    if instagram_user_active_instagram_account.downloading_now:
-        bot.send_message(message.chat.id, f'Your instagram account {instagram_user_active_instagram_account.username} '
-                                          f'currently have a work, wait for it')
-        return
+    # if instagram_user_active_instagram_account.downloading_now:
+    #     bot.send_message(message.chat.id, f'Your instagram account {instagram_user_active_instagram_account.username} '
+    #                                       f'currently have a work, wait for it')
+    #     return
     try:
         update_instagram_user_active_instagram_account_by_id(instagram_user_active_instagram_account.id, True)
         inst(f'Current target: {instagram_user.username}')
