@@ -14,7 +14,7 @@ def get_media(bot, message, instagram_user, target):
     #                                       f'currently have a work, wait for it')
     #     return
     try:
-        update_instagram_user_active_instagram_account_by_id(instagram_user_active_instagram_account.id, True)
+        # update_instagram_user_active_instagram_account_by_id(instagram_user_active_instagram_account.id, True)
         inst(f'Current target: {instagram_user.username}')
         active_instagram_account = get_telegram_user_active_instagram_account(message.chat.id)
         valid_instagram_account = initialize_valid_instagram_account(active_instagram_account, bot, message.chat.id)
@@ -39,4 +39,4 @@ def get_media(bot, message, instagram_user, target):
     except Exception as e:
         err(e)
         bot.send_message(message.chat.id, e)
-        update_instagram_user_active_instagram_account_by_id(instagram_user_active_instagram_account.id, False)
+        # update_instagram_user_active_instagram_account_by_id(instagram_user_active_instagram_account.id, False)

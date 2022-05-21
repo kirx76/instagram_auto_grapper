@@ -33,7 +33,8 @@ def grap_highlights(bot, message, instagram_user, cl, amount=None):
         err(e)
         bot.send_message(message.chat.id, e)
     finally:
-        update_instagram_user_active_instagram_account_by_id(instagram_user_active_instagram_account.id, False)
+        pass
+        # update_instagram_user_active_instagram_account_by_id(instagram_user_active_instagram_account.id, False)
 
 
 def download_highlight(bot, highlight_pk, message, instagram_user, cl):

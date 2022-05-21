@@ -192,7 +192,7 @@ def downloader(instagram_user, instagram_client, bot, telegram_user):
     #                                       f'currently have a work, wait for it')
     #     return
     try:
-        update_instagram_user_active_instagram_account_by_id(instagram_user_active_instagram_account.id, True)
+        # update_instagram_user_active_instagram_account_by_id(instagram_user_active_instagram_account.id, True)
         new_stories = get_new_stories(instagram_user, instagram_client)
         if len(new_stories) > 0:
             bot.send_message(telegram_user.user_id,
@@ -216,7 +216,7 @@ def downloader(instagram_user, instagram_client, bot, telegram_user):
     except Exception as e:
         err(e)
         bot.send_message(message.chat.id, e)
-        update_instagram_user_active_instagram_account_by_id(instagram_user_active_instagram_account.id, False)
+        # update_instagram_user_active_instagram_account_by_id(instagram_user_active_instagram_account.id, False)
 
 
 def default_downloader_thread_starter(func, bot, message, instagram_user, valid_instagram_account, amount=None):

@@ -33,7 +33,8 @@ def grap_stories(bot, message, instagram_user, cl, amount=0):
         err(e)
         bot.send_message(message.chat.id, e)
     finally:
-        update_instagram_user_active_instagram_account_by_id(instagram_user_active_instagram_account.id, False)
+        pass
+        # update_instagram_user_active_instagram_account_by_id(instagram_user_active_instagram_account.id, False)
 
 
 def download_story(bot, story, message, instagram_user, cl):
