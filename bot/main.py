@@ -224,5 +224,6 @@ def default_downloader_thread_starter(func, bot, message, instagram_user, valid_
         default_downloader_thread = threading.Thread(target=func, args=(
             bot, message, instagram_user, valid_instagram_account, amount,))
         default_downloader_thread.start()
+        default_downloader_thread.join()
     except Exception as e:
         err(e)
