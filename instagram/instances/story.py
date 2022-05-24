@@ -1,28 +1,23 @@
+from instagrapi.types import Story
+
 from bot.markups.markups import user_selected_instagram_user_markup
 from database.database import InstagramStory
-from database.get import get_active_instagram_account_by_instagram_user
-from database.set import add_instagram_story_to_instagram_user, update_instagram_user_active_instagram_account_by_id
+from database.set import add_instagram_story_to_instagram_user
 from instagram.downloads import download_and_send_story
 from utils.misc import BColors, divider, create_folder_by_username, inst, err
 
 
-def grap_stories(bot, message, instagram_user, cl, amount=0):
-    instagram_user_active_instagram_account = get_active_instagram_account_by_instagram_user(instagram_user)
+def grap_stories(bot, message, instagram_user, cl, pks):
     try:
         user_id = int(cl.user_id_from_username(instagram_user.username))
         inst(f'User id: {user_id}')
 
-        inst(f'Start collecting {instagram_user.username} {BColors.OKBLUE}stories{BColors.ENDC}')
-        stories = cl.user_stories(user_id, amount)
-        stories.reverse()
-        inst('Stories collecting complete')
-
         divider()
 
-        inst(f'Founded {len(stories)} {BColors.OKCYAN}stories{BColors.ENDC}')
-        if len(stories) > 0:
+        inst(f'Founded {len(pks)} {BColors.OKCYAN}stories{BColors.ENDC}')
+        if len(pks) > 0:
             create_folder_by_username(instagram_user.username)
-            for story in stories:
+            for story in pks:
                 download_story(bot, story, message, instagram_user, cl)
 
         inst(f'Grepping {BColors.OKCYAN}stories{BColors.ENDC} complete')
@@ -34,7 +29,6 @@ def grap_stories(bot, message, instagram_user, cl, amount=0):
         bot.send_message(message.chat.id, e)
     finally:
         pass
-        # update_instagram_user_active_instagram_account_by_id(instagram_user_active_instagram_account.id, False)
 
 
 def download_story(bot, story, message, instagram_user, cl):
@@ -44,17 +38,19 @@ def download_story(bot, story, message, instagram_user, cl):
         add_instagram_story_to_instagram_user(story, message.chat.id)
 
 
-def get_stories_list(username, instagram_client):
+def get_stories_list(username, instagram_client) -> list[Story]:
     user_id = int(instagram_client.user_id_from_username(username))
-    stories = instagram_client.user_stories(user_id)
-    arr = []
-    for story in stories:
-        arr.append(int(story.pk))
-    return arr
+    return instagram_client.user_stories(user_id)
 
 
 def get_new_stories(instagram_user, instagram_client):
     stories = get_stories_list(instagram_user.username, instagram_client)
-    instagram_user_stories = InstagramStory.select(InstagramStory.pk).execute()
-    instagram_user_stories_filtered = [int(story.pk) for story in instagram_user_stories]
-    return list(set(stories) - set(instagram_user_stories_filtered))
+    pre_instagram_user_stories = InstagramStory.select().where(InstagramStory.user == instagram_user.pk).execute()
+    instagram_user_stories_pks = [int(y.pk) for y in pre_instagram_user_stories]
+    stories_pks = [int(story.pk) for story in stories]
+    filtered_list_of_stories_pks = list(set(stories_pks) - set(instagram_user_stories_pks))
+    done_stories = []
+    for pk in filtered_list_of_stories_pks:
+        done_stories += ([x for x in stories if int(x.pk) == pk])
+
+    return done_stories

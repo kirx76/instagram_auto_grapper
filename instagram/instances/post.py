@@ -1,28 +1,21 @@
 from bot.markups.markups import user_selected_instagram_user_markup
 from database.database import InstagramPost
-from database.get import get_active_instagram_account_by_instagram_user
-from database.set import add_instagram_post_to_instagram_user, update_instagram_user_active_instagram_account_by_id
+from database.set import add_instagram_post_to_instagram_user
 from instagram.downloads import download_and_send_photo, download_and_send_video, download_and_send_album
 from utils.misc import BColors, divider, create_folder_by_username, inst, err
 
 
-def grap_posts(bot, message, instagram_user, cl, amount=0):
-    instagram_user_active_instagram_account = get_active_instagram_account_by_instagram_user(instagram_user)
+def grap_posts(bot, message, instagram_user, cl, pks):
     try:
         user_id = int(cl.user_id_from_username(instagram_user.username))
         inst(f'User id: {user_id}')
 
-        inst(f'Start collecting {instagram_user.username} {BColors.OKBLUE}posts{BColors.ENDC}')
-        posts = cl.user_medias(user_id, amount)
-        posts.reverse()
-        inst('Posts collecting complete')
-
         divider()
 
-        inst(f'Founded {len(posts)} {BColors.OKCYAN}posts{BColors.ENDC}')
-        if len(posts) > 0:
+        inst(f'Founded {len(pks)} {BColors.OKCYAN}posts{BColors.ENDC}')
+        if len(pks) > 0:
             create_folder_by_username(instagram_user.username)
-            for post in posts:
+            for post in pks:
                 download_post(bot, post, message, instagram_user, cl)
 
         inst(f'Grepping {BColors.OKCYAN}posts{BColors.ENDC} complete')
@@ -34,7 +27,6 @@ def grap_posts(bot, message, instagram_user, cl, amount=0):
         bot.send_message(message.chat.id, e)
     finally:
         pass
-        # update_instagram_user_active_instagram_account_by_id(instagram_user_active_instagram_account.id, False)
 
 
 def download_post(bot, post, message, instagram_user, cl):
@@ -52,15 +44,17 @@ def download_post(bot, post, message, instagram_user, cl):
 
 def get_posts_list(username, instagram_client):
     user_id = int(instagram_client.user_id_from_username(username))
-    posts = instagram_client.user_medias(user_id)
-    arr = []
-    for post in posts:
-        arr.append(int(post.pk))
-    return arr
+    return instagram_client.user_medias(user_id)
 
 
 def get_new_posts(instagram_user, instagram_client):
     posts = get_posts_list(instagram_user.username, instagram_client)
-    instagram_user_posts = InstagramPost.select(InstagramPost.pk).execute()
-    instagram_user_posts_filtered = [int(post.pk) for post in instagram_user_posts]
-    return list(set(posts) - set(instagram_user_posts_filtered))
+    pre_instagram_user_posts = InstagramPost.select().where(InstagramPost.user == instagram_user.pk).execute()
+    instagram_user_posts_pks = [int(y.pk) for y in pre_instagram_user_posts]
+    posts_pks = [int(post.pk) for post in posts]
+    filtered_list_of_posts_pks = list(set(posts_pks) - set(instagram_user_posts_pks))
+    done_posts = []
+    for pk in filtered_list_of_posts_pks:
+        done_posts += ([x for x in posts if int(x.pk) == pk])
+
+    return done_posts

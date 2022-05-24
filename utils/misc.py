@@ -141,7 +141,7 @@ class AWS:
         return f'{BOTO3_ENDPOINT_URL}/{BOTO3_BUCKET_NAME}/{file_name}'
 
 
-def initialize_telegram_bot(threads=1):
+def initialize_telegram_bot(threads=5):
     tg('Start initialize telegram bot')
     tgbot = telebot.TeleBot(TG_BOT_TOKEN, parse_mode='HTML', num_threads=threads)
     tg('Telegram bot initialized')
@@ -173,6 +173,7 @@ def initialize_valid_instagram_account(instagram_account, bot, telegram_user_id)
     if is_valid:
         cl = Client()
         cl.load_settings(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json')
+        # cl.set_proxy("socks5://72.206.181.123:4145")
         cl.login(instagram_account.username, instagram_account.password)
         cl.dump_settings(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json')
     else:
@@ -217,10 +218,12 @@ def check_instagram_account_validity(instagram_account, bot, telegram_user_id):
         cl.challenge_code_handler = challenge_code_handler
         if not os.path.exists(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json'):
             oss('Dump does not exists')
+            # cl.set_proxy("socks5://72.206.181.123:4145")
             cl.login(instagram_account.username, instagram_account.password, True)
         else:
             oss('Dump founded, trying load with this')
             cl.load_settings(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json')
+            # cl.set_proxy("socks5://72.206.181.123:4145")
             cl.login(instagram_account.username, instagram_account.password)
         try:
             cl.get_timeline_feed()
