@@ -8,3 +8,4 @@ venv
 !/dumps/README.md
 /docker/docker.env
 /logs.txt
+/logs_debug.txt

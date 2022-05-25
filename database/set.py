@@ -99,9 +99,8 @@ def add_instagram_post_to_instagram_user(post: InstagramPost, telegram_user_id, 
     create_or_get_instagram_user(post.user, telegram_user)
     exists_post = InstagramPost.get_or_none(InstagramPost.pk == post.pk)
     file_id = None
-    bigger_file = files[-1]
-    if hasattr(bigger_file, 'photo'):
-        file_id = bigger_file.photo[-1].file_id
+    if hasattr(files, 'file_id'):
+        file_id = files.file_id
     if exists_post is None:
         created_post, created = InstagramPost.get_or_create(
             pk=post.pk,
@@ -161,7 +160,11 @@ def add_resource_to_instagram_post(resource: InstagramPostResource,
     file_id = None
     bigger_file = files[current_index]
     if hasattr(bigger_file, 'photo'):
-        file_id = bigger_file.photo[-1].file_id
+        if bigger_file.photo is not None:
+            file_id = bigger_file.photo[-1].file_id
+    if hasattr(bigger_file, 'video'):
+        if bigger_file.video is not None:
+            file_id = bigger_file.video[-1].file_id
     if exists_resource is None:
         created_resource, created = InstagramPostResource.get_or_create(
             pk=resource.pk,
@@ -183,9 +186,8 @@ def add_instagram_story_to_instagram_user(story: InstagramStory, telegram_user_i
     create_or_get_instagram_user(story.user, telegram_user)
     exists_story = InstagramStory.get_or_none(InstagramStory.pk == story.pk)
     file_id = None
-    bigger_file = files[-1]
-    if hasattr(bigger_file, 'photo'):
-        file_id = bigger_file.photo[-1].file_id
+    if hasattr(files, 'file_id'):
+        file_id = files.file_id
     if exists_story is None:
         created_story, created = InstagramStory.get_or_create(
             pk=story.pk,
@@ -211,9 +213,8 @@ def add_instagram_highlight_to_instagram_user(highlight, telegram_user_id, files
     create_or_get_instagram_user(highlight.user, telegram_user)
     exists_highlight = InstagramHighlight.get_or_none(InstagramHighlight.pk == highlight.pk)
     file_id = None
-    bigger_file = files[-1]
-    if hasattr(bigger_file, 'photo'):
-        file_id = bigger_file.photo[-1].file_id
+    if hasattr(files, 'file_id'):
+        file_id = files.file_id
     if exists_highlight is None:
         created_highlight, created = InstagramHighlight.get_or_create(
             pk=highlight.pk,

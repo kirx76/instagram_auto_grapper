@@ -1,4 +1,5 @@
 import time
+from logging import getLogger, DEBUG, FileHandler, Formatter
 
 from telebot import TeleBot
 from telebot.types import InputMediaPhoto
@@ -62,16 +63,28 @@ def download_and_send_video(bot: TeleBot, video, message, username, cl):
     downloaded_video_path = cl.video_download(video.pk, folder=f'./downloads/{username}')
     time.sleep(2)
     sent = bot.send_video(chat_id=message.chat.id, video=open(downloaded_video_path, 'rb'), supports_streaming=True,
-                         caption=collect_caption_to_send(video, username))
+                          caption=collect_caption_to_send(video, username))
     cleanup_downloaded_file_by_filepath(downloaded_video_path)
     return True, sent.video
+
+
+logger = getLogger('development')
+logger.setLevel(DEBUG)
+
+handler = FileHandler('logs_debug.txt')
+handler.setFormatter(Formatter(fmt='[%(asctime)s: %(levelname)s] %(message)s'))
+logger.addHandler(handler)
 
 
 def download_and_send_album(bot: TeleBot, album, message, username, cl):
     downloaded_photo_paths = cl.album_download(album.pk, folder=f'./downloads/{username}')
     data = []
     # TODO IF ALBUM HAVE A VIDEO -> SENDS THUMBNAIL OF VIDEO NOT VIDEO
+    logger.debug(f'[DEBUG]: {downloaded_photo_paths}')
+    logger.debug(f'[ALUBUMM]: {album}')
     for i, source in enumerate(downloaded_photo_paths):
+        print('SURSA', source)
+        logger.debug(f'[SURSA]: {source}')
         if i == 0:
             data.append(InputMediaPhoto(open(source, 'rb'), caption=collect_caption_to_send(album, username)))
         else:
