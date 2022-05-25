@@ -35,7 +35,7 @@ def download_and_send_highlight(bot: TeleBot, highlight, message, username, cl):
         return False
     except Exception as e:
         err(f'Тут снова ошибка ебаная на хайлайтах при загрузке, чекай: {e}')
-        return False
+        return True, highlight
 
 
 def download_and_send_story(bot: TeleBot, story, message, username, cl):
@@ -56,7 +56,7 @@ def download_and_send_story(bot: TeleBot, story, message, username, cl):
         return False
     except Exception as e:
         err(f'Тут снова ошибка ебаная на сторисах при загрузке, чекай: {e}')
-        return False
+        return True, story
 
 
 def download_and_send_video(bot: TeleBot, video, message, username, cl):

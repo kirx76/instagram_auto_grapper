@@ -19,12 +19,6 @@ def add_instagram_user(username, user_id, bot, telegram_user_id) -> InstagramUse
     return create_or_get_instagram_user(instagram_user_info, telegram_user)
 
 
-def set_instagram_verification_code_by_username(username, verification_code):
-    InstagramAccount.update({
-        verification_code: verification_code
-    }).where(InstagramAccount.username == username).execute()
-
-
 def delete_selected_instagram_account(user_id):
     selected = get_selected_instagram_account(user_id)
     TelegramUser.update({TelegramUser.selected_instagram_account: None}).where(
@@ -145,6 +139,7 @@ def create_or_get_instagram_user(instagram_user: InstagramUser, telegram_user: T
             is_private=instagram_user.is_private,
             added_by=telegram_user.id,
             profile_pic_location=pic_location,
+            enabled=True,
         )
         dbm(f'Instagram user {instagram_user.username} added by {telegram_user.username}')
         return created_user
@@ -233,12 +228,6 @@ def add_instagram_highlight_to_instagram_user(highlight, telegram_user_id, files
     else:
         dbm(f'Instagram highlight with pk:{highlight.pk} for {highlight.user.username} already exists')
         return exists_highlight
-
-
-def update_instagram_user_active_instagram_account_by_id(instagram_account_id, state):
-    dbm(f'Set instagram account downloading state: {state}')
-    InstagramAccount.update({InstagramAccount.downloading_now: state}).where(
-        InstagramAccount.id == instagram_account_id).execute()
 
 
 def clean_all_instagram_account_works():

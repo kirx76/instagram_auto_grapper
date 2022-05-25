@@ -7,7 +7,7 @@ from bot.instagram_account_logic import user_add_instagram_account, user_instagr
     user_select_instagram_account, user_instagram_account_change_active, user_instagram_account_check_status, \
     user_delete_instagram_account
 from bot.instagram_user_logic import user_instagram_users, user_add_instagram_user, \
-    user_select_instagram_user, user_instagram_user_change_active, user_instagram_user_get
+    user_select_instagram_user, user_instagram_user_change_active, user_instagram_user_get, user_instagram_user_get_sent
 from bot.main import send_start, user_main_menu, antispam_func, AdminFilter, main_scheduler, DownloadingFilter, \
     BannedFilter, UsualFilter, NormalFilter, VIPFilter, characters_page_callback
 from database.database import initialize_db
@@ -60,6 +60,9 @@ def register_instagram_user_handlers():
                                         func=lambda call: 'user_instagram_user:' in call.data, pass_bot=True)
     bot.register_callback_query_handler(user_instagram_user_get, banned=False, downloading=False,
                                         func=lambda call: 'user_instagram_user_get:' in call.data,
+                                        pass_bot=True)
+    bot.register_callback_query_handler(user_instagram_user_get_sent, banned=False, downloading=False,
+                                        func=lambda call: 'user_instagram_user_get_sent:' in call.data,
                                         pass_bot=True)
     bot.register_callback_query_handler(characters_page_callback, banned=False, downloading=False,
                                         func=lambda call: 'user_instagram_user_page:' in call.data, pass_bot=True)

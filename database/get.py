@@ -1,4 +1,5 @@
-from database.database import TelegramUser, InstagramAccount, InstagramUser
+from database.database import TelegramUser, InstagramAccount, InstagramUser, InstagramPost, InstagramStory, \
+    InstagramHighlight
 from utils.misc import dbm
 
 
@@ -6,16 +7,6 @@ def get_telegram_user_by_instagram_user_username(username) -> TelegramUser:
     dbm('Getting telegram user by instagram user username')
     return TelegramUser.select().join(InstagramUser).where(
         InstagramUser.username == username).first()
-
-
-def get_instagram_account_by_username(username) -> InstagramAccount:
-    dbm('Getting instagram account user by username')
-    return InstagramAccount.select().where(InstagramAccount.username == username).first()
-
-
-def get_telegram_user_by_instagram_account_username(username) -> TelegramUser:
-    return TelegramUser.select().join(InstagramAccount).where(
-        InstagramAccount.username == username).first()
 
 
 def get_active_instagram_account_by_telegram_user_id(user_id) -> InstagramAccount:
@@ -38,11 +29,6 @@ def get_all_instagram_accounts_for_admin() -> list[InstagramAccount]:
     return InstagramAccount.select().execute()
 
 
-def get_all_instagram_users_for_admin() -> list[InstagramUser]:
-    dbm('Get all instagram users for admin')
-    return InstagramUser.select().execute()
-
-
 def get_enabled_instagram_users() -> list[InstagramUser]:
     dbm('Getting all enabled instagram users')
     return InstagramUser.select().where(InstagramUser.enabled == True).execute()
@@ -58,7 +44,8 @@ def get_telegram_user_active_instagram_account(user_id) -> InstagramAccount:
 def get_telegram_user_instagram_users_paginated(user_id, page) -> list[InstagramUser]:
     telegram_user = get_current_telegram_user(user_id)
     dbm('Getting telegram user instagram users')
-    return InstagramUser.select().where(InstagramUser.added_by == telegram_user.id).order_by(InstagramUser.pk).paginate(
+    return InstagramUser.select().where(InstagramUser.added_by == telegram_user.id).order_by(
+        InstagramUser.username).paginate(
         page, 5).execute()
 
 
@@ -110,3 +97,18 @@ def get_selected_instagram_account(user_id) -> InstagramAccount:
 def get_current_telegram_user(user_id) -> TelegramUser:
     dbm('Getting current telegram user')
     return TelegramUser.select().where(TelegramUser.user_id == user_id).first()
+
+
+def get_instagram_posts_with_file_id_by_instagram_user(instagram_user: InstagramUser) -> list[InstagramPost]:
+    return InstagramPost.select().where(
+        (InstagramPost.user == instagram_user.pk) & (InstagramPost.telegram_file_id != '')).execute()
+
+
+def get_instagram_stories_with_file_id_by_instagram_user(instagram_user: InstagramUser) -> list[InstagramStory]:
+    return InstagramStory.select().where(
+        (InstagramStory.user == instagram_user.pk) & (InstagramStory.telegram_file_id != '')).execute()
+
+
+def get_instagram_highlights_with_file_id_by_instagram_user(instagram_user: InstagramUser) -> list[InstagramHighlight]:
+    return InstagramHighlight.select().where(
+        (InstagramHighlight.user == instagram_user.pk) & (InstagramHighlight.telegram_file_id != '')).execute()

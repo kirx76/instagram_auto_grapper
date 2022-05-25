@@ -4,7 +4,7 @@ from telebot.types import CallbackQuery, Message
 from bot.markups.markups import user_instagram_users_markup, user_selected_instagram_user_markup
 from database.get import select_instagram_user, get_selected_instagram_user
 from database.set import toggle_selected_active_instagram_user, add_instagram_user
-from instagram.main import get_media
+from instagram.main import get_media, get_sent_files
 from utils.misc import get_username_from_url
 
 
@@ -39,6 +39,13 @@ def user_instagram_user_get(call: CallbackQuery, bot: TeleBot):
     target_instagram_user = get_selected_instagram_user(call.message.chat.id)
     bot.edit_message_text(f'Start collecting', call.message.chat.id, call.message.message_id)
     get_media(bot, call.message, target_instagram_user, target_for_get)
+
+
+def user_instagram_user_get_sent(call: CallbackQuery, bot: TeleBot):
+    target_for_get = call.data.partition('user_instagram_user_get_sent:')[2]
+    target_instagram_user = get_selected_instagram_user(call.message.chat.id)
+    bot.edit_message_text(f'Start collecting', call.message.chat.id, call.message.message_id)
+    get_sent_files(bot, call.message, target_instagram_user, target_for_get)
 
 
 # Default next step handlers
