@@ -31,7 +31,7 @@ def get_all_instagram_accounts_for_admin() -> list[InstagramAccount]:
 
 def get_enabled_instagram_users() -> list[InstagramUser]:
     dbm('Getting all enabled instagram users')
-    return InstagramUser.select().where(InstagramUser.enabled == True).execute()
+    return InstagramUser.select().where(InstagramUser.enabled == True).order_by(InstagramUser.username).execute()
 
 
 def get_telegram_user_active_instagram_account(user_id) -> InstagramAccount:
