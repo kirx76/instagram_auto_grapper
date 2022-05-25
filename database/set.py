@@ -94,10 +94,14 @@ def toggle_selected_active_instagram_user(user_id):
     return isub
 
 
-def add_instagram_post_to_instagram_user(post: InstagramPost, telegram_user_id) -> InstagramPost:
+def add_instagram_post_to_instagram_user(post: InstagramPost, telegram_user_id, files) -> InstagramPost:
     telegram_user = get_current_telegram_user(telegram_user_id)
     create_or_get_instagram_user(post.user, telegram_user)
     exists_post = InstagramPost.get_or_none(InstagramPost.pk == post.pk)
+    file_id = None
+    bigger_file = files[-1]
+    if hasattr(bigger_file, 'photo'):
+        file_id = bigger_file.photo[-1].file_id
     if exists_post is None:
         created_post, created = InstagramPost.get_or_create(
             pk=post.pk,
@@ -107,11 +111,12 @@ def add_instagram_post_to_instagram_user(post: InstagramPost, telegram_user_id) 
             thumbnail_url=post.thumbnail_url,
             user=post.user.pk,
             caption_text=caption_text_to_db(post),
+            telegram_file_id=file_id
         )
         if post.media_type == 8:
             dbm('Post is a album. Creating post resources')
-            for resource in post.resources:
-                add_resource_to_instagram_post(resource, created_post)
+            for i, resource in enumerate(post.resources):
+                add_resource_to_instagram_post(resource, created_post, files, i)
             dbm(f'Created instagram post with pk:{post.pk} for {post.user.username}')
         return created_post
     else:
@@ -150,9 +155,13 @@ def create_or_get_instagram_user(instagram_user: InstagramUser, telegram_user: T
 
 
 def add_resource_to_instagram_post(resource: InstagramPostResource,
-                                   created_post: InstagramPost) -> InstagramPostResource:
+                                   created_post: InstagramPost, files, current_index) -> InstagramPostResource:
     dbm('Adding resources to created instagram post')
     exists_resource = InstagramPostResource.get_or_none(InstagramPostResource.pk == resource.pk)
+    file_id = None
+    bigger_file = files[current_index]
+    if hasattr(bigger_file, 'photo'):
+        file_id = bigger_file.photo[-1].file_id
     if exists_resource is None:
         created_resource, created = InstagramPostResource.get_or_create(
             pk=resource.pk,
@@ -160,6 +169,7 @@ def add_resource_to_instagram_post(resource: InstagramPostResource,
             thumbnail_url=resource.thumbnail_url,
             media_type=resource.media_type,
             post=created_post.id,
+            telegram_file_id=file_id
         )
         dbm(f'Created instagram resource with pk:{resource.pk} for {created_post.id}')
         return created_resource
@@ -168,10 +178,14 @@ def add_resource_to_instagram_post(resource: InstagramPostResource,
         return exists_resource
 
 
-def add_instagram_story_to_instagram_user(story: InstagramStory, telegram_user_id) -> InstagramStory:
+def add_instagram_story_to_instagram_user(story: InstagramStory, telegram_user_id, files) -> InstagramStory:
     telegram_user = get_current_telegram_user(telegram_user_id)
     create_or_get_instagram_user(story.user, telegram_user)
     exists_story = InstagramStory.get_or_none(InstagramStory.pk == story.pk)
+    file_id = None
+    bigger_file = files[-1]
+    if hasattr(bigger_file, 'photo'):
+        file_id = bigger_file.photo[-1].file_id
     if exists_story is None:
         created_story, created = InstagramStory.get_or_create(
             pk=story.pk,
@@ -183,6 +197,7 @@ def add_instagram_story_to_instagram_user(story: InstagramStory, telegram_user_i
             video_duration=story.video_duration,
             user=story.user.pk,
             caption_text=caption_text_to_db(story),
+            telegram_file_id=file_id
         )
         dbm(f'Created instagram story with pk:{story.pk} for {story.user.username}')
         return created_story
@@ -191,10 +206,14 @@ def add_instagram_story_to_instagram_user(story: InstagramStory, telegram_user_i
         return exists_story
 
 
-def add_instagram_highlight_to_instagram_user(highlight, telegram_user_id) -> InstagramHighlight:
+def add_instagram_highlight_to_instagram_user(highlight, telegram_user_id, files) -> InstagramHighlight:
     telegram_user = get_current_telegram_user(telegram_user_id)
     create_or_get_instagram_user(highlight.user, telegram_user)
     exists_highlight = InstagramHighlight.get_or_none(InstagramHighlight.pk == highlight.pk)
+    file_id = None
+    bigger_file = files[-1]
+    if hasattr(bigger_file, 'photo'):
+        file_id = bigger_file.photo[-1].file_id
     if exists_highlight is None:
         created_highlight, created = InstagramHighlight.get_or_create(
             pk=highlight.pk,
@@ -206,6 +225,7 @@ def add_instagram_highlight_to_instagram_user(highlight, telegram_user_id) -> In
             video_duration=highlight.video_duration,
             user=highlight.user.pk,
             caption_text=caption_text_to_db(highlight),
+            telegram_file_id=file_id
         )
         dbm(f'Created instagram highlight with pk:{highlight.pk} for {highlight.user.username}')
         return created_highlight

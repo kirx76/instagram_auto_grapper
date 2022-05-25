@@ -19,6 +19,9 @@ db = PostgresqlExtDatabase(PG_APP_NAME, user=PG_USER, password=PG_USER_PASSWORD,
                            autocommit=True,
                            thread_safe=True)
 
+# migrator = PostgresqlMigrator(db)
+# telegram_file_id = TextField(null=True)
+
 
 def initialize_db():
     dbm('Connecting to database')
@@ -112,6 +115,7 @@ class InstagramPost(BaseModel):
     thumbnail_url = TextField(null=True)
     user = ForeignKeyField(InstagramUser, backref='posts')
     caption_text = TextField(null=True)
+    telegram_file_id = TextField(null=True)
 
 
 class InstagramStory(BaseModel):
@@ -125,6 +129,7 @@ class InstagramStory(BaseModel):
     video_duration = FloatField(null=True)
     user = ForeignKeyField(InstagramUser, backref='stories')
     caption_text = TextField(null=True)
+    telegram_file_id = TextField(null=True)
 
 
 class InstagramHighlight(BaseModel):
@@ -138,6 +143,7 @@ class InstagramHighlight(BaseModel):
     video_duration = FloatField(null=True)
     user = ForeignKeyField(InstagramUser, backref='highlights')
     caption_text = TextField(null=True)
+    telegram_file_id = TextField(null=True)
 
 
 class InstagramPostResource(BaseModel):
@@ -146,3 +152,11 @@ class InstagramPostResource(BaseModel):
     thumbnail_url = TextField(null=True)
     media_type = IntegerField()
     post = ForeignKeyField(InstagramPost, backref='resources')
+    telegram_file_id = TextField(null=True)
+
+# migrate(
+#     migrator.add_column('instagrampost', 'telegram_file_id', telegram_file_id),
+#     migrator.add_column('instagramstory', 'telegram_file_id', telegram_file_id),
+#     migrator.add_column('instagramhighlight', 'telegram_file_id', telegram_file_id),
+#     migrator.add_column('instagrampostresource', 'telegram_file_id', telegram_file_id),
+# )

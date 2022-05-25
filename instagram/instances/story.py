@@ -33,9 +33,9 @@ def grap_stories(bot, message, instagram_user, cl, pks):
 
 def download_story(bot, story, message, instagram_user, cl):
     inst(f'Start downloading and sending {instagram_user.username} story')
-    sent = download_and_send_story(bot, story, message, instagram_user.username, cl)
+    sent, files = download_and_send_story(bot, story, message, instagram_user.username, cl)
     if sent:
-        add_instagram_story_to_instagram_user(story, message.chat.id)
+        add_instagram_story_to_instagram_user(story, message.chat.id, files)
 
 
 def get_stories_list(username, instagram_client) -> list[Story]:

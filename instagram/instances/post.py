@@ -32,14 +32,15 @@ def grap_posts(bot, message, instagram_user, cl, pks):
 def download_post(bot, post, message, instagram_user, cl):
     inst(f'Start downloading and sending {instagram_user.username} post')
     sent = False
+    files = None
     if post.media_type == 1:
-        sent = download_and_send_photo(bot, post, message, instagram_user.username, cl)
+        sent, files = download_and_send_photo(bot, post, message, instagram_user.username, cl)
     if post.media_type == 2:
-        sent = download_and_send_video(bot, post, message, instagram_user.username, cl)
+        sent, files = download_and_send_video(bot, post, message, instagram_user.username, cl)
     if post.media_type == 8:
-        sent = download_and_send_album(bot, post, message, instagram_user.username, cl)
+        sent, files = download_and_send_album(bot, post, message, instagram_user.username, cl)
     if sent:
-        add_instagram_post_to_instagram_user(post, message.chat.id)
+        add_instagram_post_to_instagram_user(post, message.chat.id, files)
 
 
 def get_posts_list(username, instagram_client):

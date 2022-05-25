@@ -32,9 +32,9 @@ def grap_highlights(bot, message, instagram_user, cl, pks):
 def download_highlight(bot, highlight_pk, message, instagram_user, cl):
     inst(f'Start downloading and sending {instagram_user.username} highlight')
     highlight = cl.story_info(highlight_pk)
-    sent = download_and_send_highlight(bot, highlight, message, instagram_user.username, cl)
+    sent, files = download_and_send_highlight(bot, highlight, message, instagram_user.username, cl)
     if sent:
-        add_instagram_highlight_to_instagram_user(highlight, message.chat.id)
+        add_instagram_highlight_to_instagram_user(highlight, message.chat.id, files)
 
 
 def get_highlights_list(username, instagram_client):
