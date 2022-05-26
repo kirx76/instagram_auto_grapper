@@ -25,3 +25,6 @@ typing_extensions==4.2.0
 tzdata==2022.1
 tzlocal==4.2
 urllib3==1.26.9
+docker==4.1.0
+Flask==1.1.1
+coverage==4.5.4

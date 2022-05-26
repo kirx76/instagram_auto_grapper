@@ -1,0 +1,12 @@
+[Unit]
+Description=Deployment web server
+After=network-online.target
+
+[Service]
+Type=simple
+RestartSec=3
+ExecStart=/usr/local/bin/ci_example
+Environment=CI_TOKEN=a21d378d9ccf71deb0f73175d8428000838b44de
+
+[Install]
+WantedBy=multi-user.target
