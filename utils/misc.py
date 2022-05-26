@@ -9,7 +9,7 @@ import boto3
 import telebot
 from dotenv import load_dotenv
 from instagrapi import Client
-from instagrapi.exceptions import ClientLoginRequired, LoginRequired
+from instagrapi.exceptions import ClientLoginRequired, LoginRequired, TwoFactorRequired, PleaseWaitFewMinutes
 
 logger = getLogger('__main__')
 logger.setLevel(DEBUG)
@@ -182,7 +182,13 @@ def initialize_valid_instagram_account(instagram_account, bot, telegram_user_id)
     return cl
 
 
-def check_instagram_account_validity(instagram_account, bot, telegram_user_id):
+def process_challenge_two_factor_code(message, bot, telegram_user_id, instagram_account):
+    two_factor_code = message.text
+    bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+    check_instagram_account_validity(instagram_account, bot, telegram_user_id, two_factor_code)
+
+
+def check_instagram_account_validity(instagram_account, bot: telebot.TeleBot, telegram_user_id, two_factor_code=None):
     code = ''
     attempts = 0
     inst(f'Start checking instagram account {instagram_account.username}')
@@ -219,12 +225,19 @@ def check_instagram_account_validity(instagram_account, bot, telegram_user_id):
         if not os.path.exists(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json'):
             oss('Dump does not exists')
             # cl.set_proxy("socks5://72.206.181.123:4145")
-            cl.login(instagram_account.username, instagram_account.password, True)
+            if two_factor_code is None:
+                cl.login(instagram_account.username, instagram_account.password, True)
+            else:
+                cl.login(instagram_account.username, instagram_account.password, True,
+                         verification_code=two_factor_code)
         else:
             oss('Dump founded, trying load with this')
             cl.load_settings(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json')
             # cl.set_proxy("socks5://72.206.181.123:4145")
-            cl.login(instagram_account.username, instagram_account.password)
+            if two_factor_code is None:
+                cl.login(instagram_account.username, instagram_account.password)
+            else:
+                cl.login(instagram_account.username, instagram_account.password, verification_code=two_factor_code)
         try:
             cl.get_timeline_feed()
             inst('Saving authorization dump')
@@ -246,6 +259,15 @@ def check_instagram_account_validity(instagram_account, bot, telegram_user_id):
         except Exception as e:
             err(e)
             return False
+    except TwoFactorRequired as e:
+        err(e)
+        msg = bot.send_message(telegram_user_id,
+                               'Bad initialization, you need to write two-factor code in next message.')
+        bot.register_next_step_handler(msg, process_challenge_two_factor_code, bot, telegram_user_id,
+                                       instagram_account)
+    except PleaseWaitFewMinutes as e:
+        err(e)
+        time.sleep(60)
     except Exception as e:
         err(e)
     return False

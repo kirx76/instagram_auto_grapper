@@ -1,8 +1,9 @@
+import mimetypes
 import time
 from logging import getLogger, DEBUG, FileHandler, Formatter
 
 from telebot import TeleBot
-from telebot.types import InputMediaPhoto
+from telebot.types import InputMediaPhoto, InputMediaVideo
 
 from utils.misc import collect_caption_to_send, err, cleanup_downloaded_file_by_filepath
 
@@ -85,10 +86,18 @@ def download_and_send_album(bot: TeleBot, album, message, username, cl):
     for i, source in enumerate(downloaded_photo_paths):
         print('SURSA', source)
         logger.debug(f'[SURSA]: {source}')
+        mt = mimetypes.guess_type(source)
+
         if i == 0:
-            data.append(InputMediaPhoto(open(source, 'rb'), caption=collect_caption_to_send(album, username)))
+            if mt[0] == 'video/mp4':
+                data.append(InputMediaVideo(open(source, 'rb'), caption=collect_caption_to_send(album, username)))
+            else:
+                data.append(InputMediaPhoto(open(source, 'rb'), caption=collect_caption_to_send(album, username)))
         else:
-            data.append(InputMediaPhoto(open(source, 'rb')))
+            if mt[0] == 'video/mp4':
+                data.append(InputMediaVideo(open(source, 'rb')))
+            else:
+                data.append(InputMediaPhoto(open(source, 'rb')))
     time.sleep(2)
     sent = bot.send_media_group(message.chat.id, data)
     for source in downloaded_photo_paths:
