@@ -1,6 +1,6 @@
 APScheduler
 boto3
-psycopg2
+psycopg2-binary
 instagrapi
 peewee
 python-dotenv
