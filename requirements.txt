@@ -1,0 +1,7 @@
+APScheduler
+boto3
+instagrapi
+peewee
+python-dotenv
+requests
+pyTelegramBotAPI
