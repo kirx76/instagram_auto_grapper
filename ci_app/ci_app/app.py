@@ -73,7 +73,7 @@ def get_container_name(item: dict) -> [str, str]:
         return ''
     owner = item.get('owner')
     repository = item.get('repository')
-    tag = item.get('tag', 'latest').replace('v', '')
+    tag = item.get('tag', 'master').replace('v', '')
     if owner and repository and tag:
         return f'{owner}/{repository}:{tag}', repository
     if repository and tag:
