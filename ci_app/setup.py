@@ -5,7 +5,7 @@ setup(
     name='ci_example',
     version='0.0.1',
     description="Training with GitHub Actions",
-    author='dementevda',
+    author='kirx76',
     packages=['ci_app'],
     install_requires=['Flask', 'docker'],
     include_package_data=True,
