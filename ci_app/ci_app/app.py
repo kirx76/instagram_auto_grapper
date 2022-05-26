@@ -9,6 +9,7 @@ from flask import Flask
 from flask import request, jsonify
 import docker
 
+
 log = logging.getLogger(__name__)
 app = Flask(__name__)
 docker_client = docker.from_env()
@@ -56,9 +57,9 @@ def get_active_containers():
             'short_id': container.short_id,
             'container_name': container.name,
             'image_name': container.image.tags,
-            'created': container.attrs['Created'],
-            'status': container.status,
-            'ports': container.ports,
+            'created':  container.attrs['Created'],
+            'status':  container.status,
+            'ports':  container.ports,
         })
     return result
 
@@ -73,7 +74,7 @@ def get_container_name(item: dict) -> [str, str]:
         return ''
     owner = item.get('owner')
     repository = item.get('repository')
-    tag = item.get('tag', 'master').replace('v', '')
+    tag = item.get('tag', 'latest').replace('v', '')
     if owner and repository and tag:
         return f'{owner}/{repository}:{tag}', repository
     if repository and tag:
