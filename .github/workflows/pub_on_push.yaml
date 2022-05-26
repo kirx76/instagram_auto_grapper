@@ -1,9 +1,9 @@
-name: Publish on Docker Hub and Deploy
+name: Publish on Docker Hub and Deploy after master push
 
 on:
- release:
-   types: [published]
-
+  push:
+    branches:
+      - 'master'
 jobs:
   run_build:
     runs-on: [ubuntu-latest]
@@ -17,7 +17,7 @@ jobs:
         run: pip install -r requirements.txt
 
   build_and_pub:
-#    needs: [run_tests]
+    needs: [run_build]
     runs-on: [ubuntu-latest]
     env:
       LOGIN: ${{ secrets.DOCKER_LOGIN }}
