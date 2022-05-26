@@ -17,7 +17,7 @@ jobs:
 #        run: pip install -r requirements.txt
 
   build_and_pub:
-    needs: [run_build]
+#    needs: [run_build]
     runs-on: [ubuntu-latest]
     env:
       LOGIN: ${{ secrets.DOCKER_LOGIN }}
