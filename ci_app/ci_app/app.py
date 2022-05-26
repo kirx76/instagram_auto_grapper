@@ -69,11 +69,13 @@ def get_container_name(item: dict) -> [str, str]:
     :param item:
     :return:
     """
+    log.info(f'ITEMSADASD {item}')
     if not isinstance(item, dict):
         return ''
     owner = item.get('owner')
     repository = item.get('repository')
     tag = item.get('tag', 'latest').replace('v', '')
+    log.info(f'{owner} {repository} {tag}')
     if owner and repository and tag:
         return f'{owner}/{repository}:{tag}', repository
     if repository and tag:
@@ -106,9 +108,6 @@ def kill_old_container(container_name: str) -> bool:
 def deploy_new_container(image_name: str, container_name: str, ports: dict = None):
     try:
         # Пул последнего image из docker hub'a
-        print(image_name)
-        print(container_name)
-        print(ports)
         log.info(f'pull {image_name}, name={container_name}')
         docker_client.images.pull(image_name)
         log.debug('Success')
