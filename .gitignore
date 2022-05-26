@@ -9,3 +9,4 @@ venv
 /docker/docker.env
 /logs.txt
 /logs_debug.txt
+/dev.db

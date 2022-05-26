@@ -3,7 +3,7 @@ import math
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from telegram_bot_pagination import InlineKeyboardPaginator
 
-from database.database import InstagramPost, InstagramStory, InstagramHighlight
+from database.database import InstagramPost, InstagramStory, InstagramHighlight, InstagramPostResource
 from database.get import get_current_telegram_user, get_instagram_accounts_by_telegram_user_id, \
     get_telegram_user_instagram_users, get_telegram_user_instagram_users_paginated
 
@@ -72,7 +72,9 @@ def user_selected_instagram_user_markup(instagram_user):
     posts_count = instagram_user.posts.select().count()
     stories_count = instagram_user.stories.select().count()
     highlights_count = instagram_user.highlights.select().count()
-    posts_count_sent = instagram_user.posts.select().where(InstagramPost.telegram_file_id != '').count()
+    posts_count_sent = instagram_user.posts.select().where(
+        (InstagramPost.telegram_file_id != '') | (InstagramPostResource.telegram_file_id != '')).join(
+        InstagramPostResource).count()
     stories_count_sent = instagram_user.stories.select().where(InstagramStory.telegram_file_id != '').count()
     highlights_count_sent = instagram_user.highlights.select().where(InstagramHighlight.telegram_file_id != '').count()
     if instagram_user.enabled:
