@@ -9,7 +9,6 @@ from flask import Flask
 from flask import request, jsonify
 import docker
 
-
 log = logging.getLogger(__name__)
 app = Flask(__name__)
 docker_client = docker.from_env()
@@ -57,9 +56,9 @@ def get_active_containers():
             'short_id': container.short_id,
             'container_name': container.name,
             'image_name': container.image.tags,
-            'created':  container.attrs['Created'],
-            'status':  container.status,
-            'ports':  container.ports,
+            'created': container.attrs['Created'],
+            'status': container.status,
+            'ports': container.ports,
         })
     return result
 
@@ -107,6 +106,9 @@ def kill_old_container(container_name: str) -> bool:
 def deploy_new_container(image_name: str, container_name: str, ports: dict = None):
     try:
         # Пул последнего image из docker hub'a
+        print(image_name)
+        print(container_name)
+        print(ports)
         log.info(f'pull {image_name}, name={container_name}')
         docker_client.images.pull(image_name)
         log.debug('Success')
