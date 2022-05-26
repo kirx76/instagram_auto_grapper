@@ -6,15 +6,15 @@ from telebot import TeleBot
 from telebot.custom_filters import SimpleCustomFilter
 from telebot.types import Message, CallbackQuery
 
-from bot.markups.markups import main_menu_markup, user_instagram_users_markup
-from database.get import get_current_telegram_user, get_telegram_user_active_instagram_account, \
+from src.bot.markups.markups import main_menu_markup, user_instagram_users_markup
+from src.database.get import get_current_telegram_user, get_telegram_user_active_instagram_account, \
     get_enabled_instagram_users, get_telegram_user_by_instagram_user_username, \
     get_active_instagram_account_by_instagram_user
-from database.set import create_db_telegram_user
-from instagram.instances.highlight import get_new_highlights, grap_highlights
-from instagram.instances.post import get_new_posts, grap_posts
-from instagram.instances.story import get_new_stories, grap_stories
-from utils.misc import err, inst, initialize_valid_instagram_account, PseudoTelegramChat
+from src.database.set import create_db_telegram_user
+from src.instagram.instances.highlight import get_new_highlights, grap_highlights
+from src.instagram.instances.post import get_new_posts, grap_posts
+from src.instagram.instances.story import get_new_stories, grap_stories
+from src.utils.misc import err, inst, initialize_valid_instagram_account, PseudoTelegramChat
 
 
 def send_start(message: Message, bot: TeleBot):

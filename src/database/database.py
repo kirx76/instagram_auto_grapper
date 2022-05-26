@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from peewee import *
 from playhouse.postgres_ext import PostgresqlExtDatabase
 
-from utils.misc import dbm
+from src.utils.misc import dbm
 
 load_dotenv()
 

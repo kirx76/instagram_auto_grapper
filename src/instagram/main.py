@@ -6,15 +6,15 @@ from dotenv import load_dotenv
 from telebot import TeleBot
 from telebot.types import InputMediaPhoto, InputMediaVideo
 
-from bot.main import default_downloader_thread_starter
-from bot.markups.markups import user_selected_instagram_user_markup
-from database.get import get_telegram_user_active_instagram_account, get_instagram_posts_with_file_id_by_instagram_user, \
+from src.bot.main import default_downloader_thread_starter
+from src.bot.markups.markups import user_selected_instagram_user_markup
+from src.database.get import get_telegram_user_active_instagram_account, get_instagram_posts_with_file_id_by_instagram_user, \
     get_instagram_stories_with_file_id_by_instagram_user, get_instagram_highlights_with_file_id_by_instagram_user, \
     get_instagram_post_resources_with_file_id_by_instagram_post
-from instagram.instances.highlight import get_new_highlights, grap_highlights
-from instagram.instances.post import get_new_posts, grap_posts
-from instagram.instances.story import get_new_stories, grap_stories
-from utils.misc import initialize_valid_instagram_account, err, inst
+from src.instagram.instances.highlight import get_new_highlights, grap_highlights
+from src.instagram.instances.post import get_new_posts, grap_posts
+from src.instagram.instances.story import get_new_stories, grap_stories
+from src.utils.misc import initialize_valid_instagram_account, err, inst
 
 load_dotenv()
 

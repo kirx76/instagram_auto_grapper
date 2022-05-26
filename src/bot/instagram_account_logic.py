@@ -1,11 +1,11 @@
 from telebot import TeleBot
 from telebot.types import CallbackQuery, Message
 
-from bot.markups.markups import user_instagram_accounts_markup, user_selected_instagram_account_markup
-from database.get import select_instagram_account, get_selected_instagram_account
-from database.set import delete_selected_instagram_account, toggle_selected_active_instagram_account, \
+from src.bot.markups.markups import user_instagram_accounts_markup, user_selected_instagram_account_markup
+from src.database.get import select_instagram_account, get_selected_instagram_account
+from src.database.set import delete_selected_instagram_account, toggle_selected_active_instagram_account, \
     set_selected_instagram_account_validity, add_instagram_account
-from utils.misc import check_instagram_account_validity
+from src.utils.misc import check_instagram_account_validity
 
 
 def user_add_instagram_account(call: CallbackQuery, bot: TeleBot):

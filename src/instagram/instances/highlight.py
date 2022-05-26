@@ -1,8 +1,8 @@
-from bot.markups.markups import user_selected_instagram_user_markup
-from database.database import InstagramHighlight
-from database.set import add_instagram_highlight_to_instagram_user
-from instagram.downloads import download_and_send_highlight
-from utils.misc import BColors, divider, create_folder_by_username, err, inst
+from src.bot.markups.markups import user_selected_instagram_user_markup
+from src.database.database import InstagramHighlight
+from src.database.set import add_instagram_highlight_to_instagram_user
+from src.instagram.downloads import download_and_send_highlight
+from src.utils.misc import BColors, divider, create_folder_by_username, err, inst
 
 
 def grap_highlights(bot, message, instagram_user, cl, pks):

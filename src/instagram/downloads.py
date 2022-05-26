@@ -5,7 +5,7 @@ from logging import getLogger, DEBUG, FileHandler, Formatter
 from telebot import TeleBot
 from telebot.types import InputMediaPhoto, InputMediaVideo
 
-from utils.misc import collect_caption_to_send, err, cleanup_downloaded_file_by_filepath
+from src.utils.misc import collect_caption_to_send, err, cleanup_downloaded_file_by_filepath
 
 
 def download_and_send_photo(bot: TeleBot, media, message, username, cl):

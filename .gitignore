@@ -1,11 +1,11 @@
 .idea
 venv
-/database/main.db
+/src/database/main.db
 .env
-/downloads/*
-!/downloads/README.md
-/dumps/*
-!/dumps/README.md
+/src/downloads/*
+!/src/downloads/README.md
+/src/dumps/*
+!/src/dumps/README.md
 /docker/docker.env
 /logs.txt
 /logs_debug.txt
