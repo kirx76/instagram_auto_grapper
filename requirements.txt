@@ -1,8 +1,9 @@
-APScheduler
-boto3
-psycopg2-binary
-instagrapi
-peewee
-python-dotenv
-requests
 pyTelegramBotAPI
+python-dotenv
+peewee
+boto3
+instagrapi
+pillow
+python-telegram-bot-pagination
+apscheduler
+psycopg2-binary
