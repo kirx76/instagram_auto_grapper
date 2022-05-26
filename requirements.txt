@@ -1,6 +1,6 @@
 APScheduler
 boto3
-pycryptodomex
+psycopg2
 instagrapi
 peewee
 python-dotenv
