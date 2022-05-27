@@ -22,6 +22,17 @@ jobs:
     env:
       LOGIN: ${{ secrets.DOCKER_LOGIN }}
       NAME: ${{ secrets.DOCKER_NAME }}
+      TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+      IG_DUMP_FOLDER_PATH: ${{ secrets.IG_DUMP_FOLDER_PATH }}
+      PG_APP_NAME: ${{ secrets.PG_APP_NAME }}
+      PG_USER: ${{ secrets.PG_USER }}
+      PG_USER_PASSWORD: ${{ secrets.PG_USER_PASSWORD }}
+      PG_HOST: ${{ secrets.PG_HOST }}
+      PG_PORT: ${{ secrets.PG_PORT }}
+      BOTO3_ACCESS_KEY: ${{ secrets.BOTO3_ACCESS_KEY }}
+      BOTO3_SECRET_KEY: ${{ secrets.BOTO3_SECRET_KEY }}
+      BOTO3_BUCKET_NAME: ${{ secrets.BOTO3_BUCKET_NAME }}
+      BOTO3_ENDPOINT_URL: ${{ secrets.BOTO3_ENDPOINT_URL }}
     steps:
       - name: Login to docker.io
         run: echo ${{ secrets.DOCKER_PWD }} | docker login -u ${{ secrets.DOCKER_LOGIN }} --password-stdin
