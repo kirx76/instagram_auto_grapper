@@ -50,7 +50,7 @@ jobs:
         run: echo ::set-env name=RELEASE_VERSION:${GITHUB_REF:11}
       - name: Send webhook for deploy
         run: 'curl --location --request POST "${{ secrets.DEPLOYMENT_SERVER }}" \
-            --header "Authorization: ${{ secrets.DEPLOYMENT_TOKEN }}" \
+            --header "Authorization: ${{ secrets.CI_TOKEN }}" \
             --header "Content-Type: application/json" \
             --data-raw "{
                 \"owner\": \"${{ secrets.DOCKER_LOGIN }}\",
