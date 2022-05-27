@@ -56,17 +56,17 @@ jobs:
             \"owner\": ${{ secrets.DOCKER_LOGIN }},
             \"repository\": ${{ secrets.DOCKER_NAME }},
             \"environment\": {
-              \"TG_BOT_TOKEN\": ${{ TG_BOT_TOKEN }},
-              \"TG_BOT_API_URL\": ${{ TG_BOT_API_URL }},
-              \"IG_DUMP_FOLDER_PATH\": ${{ IG_DUMP_FOLDER_PATH }},
-              \"PG_APP_NAME\": ${{ PG_APP_NAME }},
-              \"PG_USER\": ${{ PG_USER }},
-              \"PG_USER_PASSWORD\": ${{ PG_USER_PASSWORD }},
-              \"PG_HOST\": ${{ PG_HOST }},
-              \"PG_PORT\": ${{ PG_PORT }},
-              \"BOTO3_ACCESS_KEY\": ${{ BOTO3_ACCESS_KEY }},
-              \"BOTO3_SECRET_KEY\": ${{ BOTO3_SECRET_KEY }},
-              \"BOTO3_BUCKET_NAME\": ${{ BOTO3_BUCKET_NAME }},
-              \"BOTO3_ENDPOINT_URL\": ${{ BOTO3_ENDPOINT_URL }}
+              \"TG_BOT_TOKEN\": \"${{ TG_BOT_TOKEN }}\",
+              \"TG_BOT_API_URL\": \"${{ TG_BOT_API_URL }}\",
+              \"IG_DUMP_FOLDER_PATH\": \"${{ IG_DUMP_FOLDER_PATH }}\",
+              \"PG_APP_NAME\": \"${{ PG_APP_NAME }}\",
+              \"PG_USER\": \"${{ PG_USER }}\",
+              \"PG_USER_PASSWORD\": \"${{ PG_USER_PASSWORD }}\",
+              \"PG_HOST\": \"${{ PG_HOST }}\",
+              \"PG_PORT\": \"${{ PG_PORT }}\",
+              \"BOTO3_ACCESS_KEY\": \"${{ BOTO3_ACCESS_KEY }}\",
+              \"BOTO3_SECRET_KEY\": \"${{ BOTO3_SECRET_KEY }}\",
+              \"BOTO3_BUCKET_NAME\": \"${{ BOTO3_BUCKET_NAME }}\",
+              \"BOTO3_ENDPOINT_URL\": \"${{ BOTO3_ENDPOINT_URL }}\"
             }
 }"
