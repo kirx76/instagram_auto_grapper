@@ -49,24 +49,24 @@ jobs:
       - name: Set tag to env
         run: echo ::set-env name=RELEASE_VERSION:${GITHUB_REF:11}
       - name: Send webhook for deploy
-        run: "
-        curl --silent --show-error --fail -X POST ${{ secrets.DEPLOYMENT_SERVER }}
-        -H 'Content-Type: application/json'
-        -H 'Authorization: ${{ secrets.DEPLOYMENT_TOKEN }}'
-        -d '{
-            \"owner\": \"${{ secrets.DOCKER_LOGIN }}\",
-            \"repository\": \"${{ secrets.DOCKER_NAME }}\",
+        run: "curl --location --request POST '${{ secrets.DEPLOYMENT_SERVER }}' \
+            --header 'Authorization: ${{ secrets.DEPLOYMENT_TOKEN }}' \
+            --header 'Content-Type: application/json' \
+              --data-raw '{
+            \"owner\": ${{ secrets.DOCKER_LOGIN }},
+            \"repository\": ${{ secrets.DOCKER_NAME }},
             \"environment\": {
-              \"TG_BOT_TOKEN\": \"${{ env.TG_BOT_TOKEN }}\",
-              \"IG_DUMP_FOLDER_PATH\": \"${{ env.IG_DUMP_FOLDER_PATH }}\",
-              \"PG_APP_NAME\": \"${{ env.PG_APP_NAME }}\",
-              \"PG_USER\": \"${{ env.PG_USER }}\",
-              \"PG_USER_PASSWORD\": \"${{ env.PG_USER_PASSWORD }}\",
-              \"PG_HOST\": \"${{ env.PG_HOST }}\",
-              \"PG_PORT\": \"${{ env.PG_PORT }}\",
-              \"BOTO3_ACCESS_KEY\": \"${{ env.BOTO3_ACCESS_KEY }}\",
-              \"BOTO3_SECRET_KEY\": \"${{ env.BOTO3_SECRET_KEY }}\",
-              \"BOTO3_BUCKET_NAME\": \"${{ env.BOTO3_BUCKET_NAME }}\",
-              \"BOTO3_ENDPOINT_URL\": \"${{ env.BOTO3_ENDPOINT_URL }}\",
-              }
-            }'"
+              \"TG_BOT_TOKEN\": ${{ TG_BOT_TOKEN }},
+              \"TG_BOT_API_URL\": ${{ TG_BOT_API_URL }},
+              \"IG_DUMP_FOLDER_PATH\": ${{ IG_DUMP_FOLDER_PATH }},
+              \"PG_APP_NAME\": ${{ PG_APP_NAME }},
+              \"PG_USER\": ${{ PG_USER }},
+              \"PG_USER_PASSWORD\": ${{ PG_USER_PASSWORD }},
+              \"PG_HOST\": ${{ PG_HOST }},
+              \"PG_PORT\": ${{ PG_PORT }},
+              \"BOTO3_ACCESS_KEY\": ${{ BOTO3_ACCESS_KEY }},
+              \"BOTO3_SECRET_KEY\": ${{ BOTO3_SECRET_KEY }},
+              \"BOTO3_BUCKET_NAME\": ${{ BOTO3_BUCKET_NAME }},
+              \"BOTO3_ENDPOINT_URL\": ${{ BOTO3_ENDPOINT_URL }}
+            }
+}"
