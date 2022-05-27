@@ -57,7 +57,7 @@ jobs:
             \"owner\": \"${{ secrets.DOCKER_LOGIN }}\",
             \"repository\": \"${{ secrets.DOCKER_NAME }}\",
             \"environment\": {
-              \"TG_BOT_TOKEN\": \"${{ env.TG_BOT_TOKEN },\"
+              \"TG_BOT_TOKEN\": \"${{ env.TG_BOT_TOKEN }}\",
               \"IG_DUMP_FOLDER_PATH\": \"${{ env.IG_DUMP_FOLDER_PATH }}\",
               \"PG_APP_NAME\": \"${{ env.PG_APP_NAME }}\",
               \"PG_USER\": \"${{ env.PG_USER }}\",
