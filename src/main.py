@@ -115,5 +115,5 @@ def run():
     bot.infinity_polling()
 
 # test cicd
-if __name__ == '__main__':
-    run()
+
+run()

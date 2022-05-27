@@ -7,9 +7,10 @@ RUN apk update && apk add gcc && apk add libc-dev && pip install -r /app/require
 # Устанавливаем приложение (Подробнее смотри Distutils)
 RUN pip3 install -e /app
 # Говорим контейнеру какой порт слушай
-EXPOSE 8088
+#EXPOSE 8088
 # Запуск нашего приложения при старте контейнера
-CMD web_server
+WORKDIR /app/src
+CMD python3 main.py
 
 # В качестве альтернативы distutils можно просто указать что выполнить
 #CMD python /app/src/app.py

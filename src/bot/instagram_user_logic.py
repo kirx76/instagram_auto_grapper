@@ -1,11 +1,11 @@
 from telebot import TeleBot
 from telebot.types import CallbackQuery, Message
 
-from src.bot.markups.markups import user_instagram_users_markup, user_selected_instagram_user_markup
-from src.database.get import select_instagram_user, get_selected_instagram_user
-from src.database.set import toggle_selected_active_instagram_user, add_instagram_user
-from src.instagram.main import get_media, get_sent_files
-from src.utils.misc import get_username_from_url
+from bot.markups.markups import user_instagram_users_markup, user_selected_instagram_user_markup
+from database.get import select_instagram_user, get_selected_instagram_user
+from database.set import toggle_selected_active_instagram_user, add_instagram_user
+from instagram.main import get_media, get_sent_files
+from utils.misc import get_username_from_url
 
 
 def user_instagram_users(call: CallbackQuery, bot: TeleBot):

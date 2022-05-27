@@ -1,6 +1,6 @@
-from src.database.database import TelegramUser, InstagramAccount, InstagramUser, InstagramPost, InstagramStory, \
+from database.database import TelegramUser, InstagramAccount, InstagramUser, InstagramPost, InstagramStory, \
     InstagramHighlight, InstagramPostResource
-from src.utils.misc import dbm
+from utils.misc import dbm
 
 
 def get_telegram_user_by_instagram_user_username(username) -> TelegramUser:

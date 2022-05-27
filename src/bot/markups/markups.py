@@ -3,8 +3,8 @@ import math
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from telegram_bot_pagination import InlineKeyboardPaginator
 
-from src.database.database import InstagramPost, InstagramStory, InstagramHighlight, InstagramPostResource
-from src.database.get import get_current_telegram_user, get_instagram_accounts_by_telegram_user_id, \
+from database.database import InstagramPost, InstagramStory, InstagramHighlight, InstagramPostResource
+from database.get import get_current_telegram_user, get_instagram_accounts_by_telegram_user_id, \
     get_telegram_user_instagram_users, get_telegram_user_instagram_users_paginated
 
 TEXTS = {

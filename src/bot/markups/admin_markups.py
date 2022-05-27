@@ -1,6 +1,6 @@
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from src.database.get import get_all_instagram_accounts_for_admin
+from database.get import get_all_instagram_accounts_for_admin
 
 
 def admin_instagram_accounts_markup():

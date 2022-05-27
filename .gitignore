@@ -10,3 +10,5 @@ venv
 /logs.txt
 /logs_debug.txt
 /dev.db
+/src/logs.txt
+/src/logs_debug.txt

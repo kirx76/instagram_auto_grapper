@@ -2,11 +2,11 @@ import datetime
 
 import requests
 
-from src.database.database import InstagramAccount, InstagramStory, InstagramPostResource, InstagramPost, InstagramUser, \
+from database.database import InstagramAccount, InstagramStory, InstagramPostResource, InstagramPost, InstagramUser, \
     TelegramUser, InstagramHighlight
-from src.database.get import get_current_telegram_user, get_selected_instagram_user, get_selected_instagram_account, \
+from database.get import get_current_telegram_user, get_selected_instagram_user, get_selected_instagram_account, \
     get_active_instagram_account_by_telegram_user_id
-from src.utils.misc import dbm, initialize_valid_instagram_account, caption_text_to_db, AWS, \
+from utils.misc import dbm, initialize_valid_instagram_account, caption_text_to_db, AWS, \
     create_folder_by_username
 
 
