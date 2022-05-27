@@ -50,7 +50,7 @@ jobs:
         run: echo ::set-env name=RELEASE_VERSION:${GITHUB_REF:11}
       - name: Send webhook for deploy
         run: "
-        curl --silent --show-error --fail -X POST ${{ secrets.DEPLOYMENT_SERVER }}
+        curl --silent --show-error --fail -X POST http://151.248.112.37:8888/
         -H 'Content-Type: application/json'
         -H 'Authorization: a21d378d9ccf71deb0f73175d8428000838b44de'
         -d '{
