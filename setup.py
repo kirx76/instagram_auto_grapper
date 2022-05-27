@@ -2,7 +2,7 @@ from setuptools import find_packages
 from setuptools import setup
 
 setup(
-    name='simple_web_app',
+    name='instagram_auto_grapper',
     description="Simple web app for test CI",
     author='kirx76',
     url='',
@@ -10,9 +10,6 @@ setup(
     package_dir={
         '': 'src'},
     include_package_data=True,
-    keywords=[
-        'web_app', 'test', 'flask'
-    ],
     entry_points={
         'console_scripts': [
             'web_server = app:main']},
