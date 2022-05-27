@@ -38,13 +38,11 @@ jobs:
         run: echo ${{ secrets.DOCKER_PWD }} | docker login -u ${{ secrets.DOCKER_LOGIN }} --password-stdin
       - uses: actions/checkout@master
       - name: Build image
-        run: docker build -t $LOGIN/$NAME:${GITHUB_REF:11} -f Dockerfile .
+        run: docker build -t $LOGIN/$NAME -f Dockerfile .
       - name: Push image to docker.io
-        run: docker push $LOGIN/$NAME:${GITHUB_REF:11}
+        run: docker push $LOGIN/$NAME
 
   deploy:
-    # Если мы успешно собрали контейнер и отправили в registry, то делаем хук деплоймент серверу
-    # Попробуем готовый экшен curl из маркетплэйса
     needs: [ build_and_pub ]
     runs-on: [ ubuntu-latest ]
     steps:
