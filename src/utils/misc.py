@@ -167,28 +167,32 @@ def collect_caption_to_send(media, username):
     return text
 
 
-def initialize_valid_instagram_account(instagram_account, bot, telegram_user_id):
+def initialize_valid_instagram_account(instagram_account, bot, telegram_user_id, saver):
     # TODO ADD PROXIES
-    is_valid = check_instagram_account_validity(instagram_account, bot, telegram_user_id)
+    is_valid = check_instagram_account_validity(instagram_account, bot, telegram_user_id, saver)
     if is_valid:
         cl = Client()
+        dump_data = instagram_account.dump_data
+        with open(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json', 'w') as f:
+            f.write(dump_data)
         cl.load_settings(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json')
-        # cl.set_proxy("socks5://72.206.181.123:4145")
         cl.login(instagram_account.username, instagram_account.password)
         cl.dump_settings(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json')
+        saver(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json', instagram_account)
     else:
         err('BAD INITIALIZE VALID INSTAGRAM ACCOUNT')
         raise SystemExit('BAD INITIALIZE VALID INSTAGRAM ACCOUNT')
     return cl
 
 
-def process_challenge_two_factor_code(message, bot, telegram_user_id, instagram_account):
+def process_challenge_two_factor_code(message, bot, telegram_user_id, instagram_account, saver):
     two_factor_code = message.text
     bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
-    check_instagram_account_validity(instagram_account, bot, telegram_user_id, two_factor_code)
+    check_instagram_account_validity(instagram_account, bot, telegram_user_id, saver, two_factor_code)
 
 
-def check_instagram_account_validity(instagram_account, bot: telebot.TeleBot, telegram_user_id, two_factor_code=None):
+def check_instagram_account_validity(instagram_account, bot: telebot.TeleBot, telegram_user_id, saver,
+                                     two_factor_code=None):
     code = ''
     attempts = 0
     inst(f'Start checking instagram account {instagram_account.username}')
@@ -222,18 +226,19 @@ def check_instagram_account_validity(instagram_account, bot: telebot.TeleBot, te
     try:
         cl = Client()
         cl.challenge_code_handler = challenge_code_handler
-        if not os.path.exists(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json'):
-            oss('Dump does not exists')
-            # cl.set_proxy("socks5://72.206.181.123:4145")
+        dump_data = instagram_account.dump_data
+        if dump_data is None:
+            oss(f'No dump for user {instagram_account.username}')
             if two_factor_code is None:
                 cl.login(instagram_account.username, instagram_account.password, True)
             else:
                 cl.login(instagram_account.username, instagram_account.password, True,
                          verification_code=two_factor_code)
         else:
-            oss('Dump founded, trying load with this')
+            oss(f'User {instagram_account.username} dump founded')
+            with open(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json', 'w') as f:
+                f.write(dump_data)
             cl.load_settings(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json')
-            # cl.set_proxy("socks5://72.206.181.123:4145")
             if two_factor_code is None:
                 cl.login(instagram_account.username, instagram_account.password)
             else:
@@ -242,19 +247,20 @@ def check_instagram_account_validity(instagram_account, bot: telebot.TeleBot, te
             cl.get_timeline_feed()
             inst('Saving authorization dump')
             cl.dump_settings(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json')
+            saver(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json', instagram_account)
             inst('Login done')
             return True
         except ClientLoginRequired as e:
             err(e)
             if os.path.exists(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json'):
                 os.remove(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json')
-                return check_instagram_account_validity(instagram_account, bot, telegram_user_id)
+                return check_instagram_account_validity(instagram_account, bot, telegram_user_id, saver)
             return False
         except LoginRequired as e:
             err(e)
             if os.path.exists(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json'):
                 os.remove(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json')
-                return check_instagram_account_validity(instagram_account, bot, telegram_user_id)
+                return check_instagram_account_validity(instagram_account, bot, telegram_user_id, saver)
             return False
         except Exception as e:
             err(e)
@@ -264,7 +270,7 @@ def check_instagram_account_validity(instagram_account, bot: telebot.TeleBot, te
         msg = bot.send_message(telegram_user_id,
                                'Bad initialization, you need to write two-factor code in next message.')
         bot.register_next_step_handler(msg, process_challenge_two_factor_code, bot, telegram_user_id,
-                                       instagram_account)
+                                       instagram_account, saver)
     except PleaseWaitFewMinutes as e:
         err(e)
         time.sleep(60)

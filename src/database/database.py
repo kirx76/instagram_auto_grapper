@@ -18,15 +18,6 @@ PG_PORT = os.environ.get("PG_PORT")
 db = PostgresqlExtDatabase(PG_APP_NAME, user=PG_USER, password=PG_USER_PASSWORD, host=PG_HOST, port=PG_PORT,
                            autocommit=True,
                            thread_safe=True)
-print('DATATATATATATATATATATATA')
-print(db)
-print(
-PG_APP_NAME,
-PG_USER,
-PG_USER_PASSWORD,
-PG_HOST,
-PG_PORT,
-)
 
 # migrator = PostgresqlMigrator(db)
 # telegram_file_id = TextField(null=True)
@@ -98,6 +89,7 @@ class InstagramAccount(BaseModel):
     last_validation_at = DateTimeField(default=datetime.datetime.now)
     downloading_now = BooleanField(default=False)
     is_deleted = BooleanField(default=False)
+    dump_data = TextField(null=True)
 
     def save(self, *args, **kwargs):
         self.last_iteration_at = datetime.datetime.now()

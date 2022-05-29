@@ -84,7 +84,6 @@ def download_and_send_album(bot: TeleBot, album, message, username, cl):
     logger.debug(f'[DEBUG]: {downloaded_photo_paths}')
     logger.debug(f'[ALUBUMM]: {album}')
     for i, source in enumerate(downloaded_photo_paths):
-        print('SURSA', source)
         logger.debug(f'[SURSA]: {source}')
         mt = mimetypes.guess_type(source)
 

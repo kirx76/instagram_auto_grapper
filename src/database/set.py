@@ -1,4 +1,5 @@
 import datetime
+import os
 
 import requests
 
@@ -10,10 +11,21 @@ from utils.misc import dbm, initialize_valid_instagram_account, caption_text_to_
     create_folder_by_username
 
 
+def save_instagram_account_dump_data(path: str, instagram_account: InstagramAccount):
+    if os.path.exists(path):
+        text_file = open(path, "r")
+        data = text_file.read()
+        text_file.close()
+        InstagramAccount.update({InstagramAccount.dump_data: data}).where(
+            InstagramAccount.username == instagram_account.username).execute()
+        os.remove(path)
+
+
 def add_instagram_user(username, user_id, bot, telegram_user_id) -> InstagramUser:
     telegram_user = get_current_telegram_user(user_id)
     active_instagram_account = get_active_instagram_account_by_telegram_user_id(user_id)
-    instagram_account = initialize_valid_instagram_account(active_instagram_account, bot, telegram_user_id)
+    instagram_account = initialize_valid_instagram_account(active_instagram_account, bot, telegram_user_id,
+                                                           save_instagram_account_dump_data)
     instagram_user_info = instagram_account.user_info_by_username(username)
     dbm('Adding instagram account')
     return create_or_get_instagram_user(instagram_user_info, telegram_user)
