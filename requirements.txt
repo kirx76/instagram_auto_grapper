@@ -28,3 +28,6 @@ urllib3==1.26.9
 docker==4.1.0
 Flask==1.1.1
 coverage==4.5.4
+pyasn1
+pyopenssl
+ndg-httpsclient

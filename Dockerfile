@@ -3,7 +3,7 @@ FROM python:3.10-alpine
 # Копируем все файлы из текущей директории в /app контейнера
 COPY ./ /app
 # Устанавливаем все зависимости
-RUN apk update && apk add gcc && apk add libc-dev && pip install -r /app/requirements.txt --no-cache-dir
+RUN apk update && apk add gcc && apk add libc-dev && apk add libffi-dev && pip install -r /app/requirements.txt --no-cache-dir
 # Устанавливаем приложение (Подробнее смотри Distutils)
 RUN pip3 install -e /app
 # Говорим контейнеру какой порт слушай
