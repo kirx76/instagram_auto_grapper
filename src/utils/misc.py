@@ -192,7 +192,7 @@ def process_challenge_two_factor_code(message, bot, telegram_user_id, instagram_
 
 
 def check_instagram_account_validity(instagram_account, bot: telebot.TeleBot, telegram_user_id, saver,
-                                     two_factor_code=None):
+                                     two_factor_code=None, relogin=False):
     code = ''
     attempts = 0
     inst(f'Start checking instagram account {instagram_account.username}')
@@ -240,9 +240,9 @@ def check_instagram_account_validity(instagram_account, bot: telebot.TeleBot, te
                 f.write(dump_data)
             cl.load_settings(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json')
             if two_factor_code is None:
-                cl.login(instagram_account.username, instagram_account.password)
+                cl.login(instagram_account.username, instagram_account.password, relogin=relogin)
             else:
-                cl.login(instagram_account.username, instagram_account.password, verification_code=two_factor_code)
+                cl.login(instagram_account.username, instagram_account.password, verification_code=two_factor_code, relogin=relogin)
         try:
             cl.get_timeline_feed()
             inst('Saving authorization dump')
@@ -254,13 +254,13 @@ def check_instagram_account_validity(instagram_account, bot: telebot.TeleBot, te
             err(e)
             if os.path.exists(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json'):
                 os.remove(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json')
-                return check_instagram_account_validity(instagram_account, bot, telegram_user_id, saver)
+                return check_instagram_account_validity(instagram_account, bot, telegram_user_id, saver, relogin=True)
             return False
         except LoginRequired as e:
             err(e)
             if os.path.exists(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json'):
                 os.remove(f'{IG_DUMP_FOLDER_PATH}{instagram_account.username}.json')
-                return check_instagram_account_validity(instagram_account, bot, telegram_user_id, saver)
+                return check_instagram_account_validity(instagram_account, bot, telegram_user_id, saver, relogin=True)
             return False
         except Exception as e:
             err(e)
