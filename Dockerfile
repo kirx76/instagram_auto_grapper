@@ -1,11 +1,14 @@
 # Берем нужный базовый образ
-FROM python:3.10-alpine
+FROM python:3.10.0-buster
 # Копируем все файлы из текущей директории в /app контейнера
 COPY ./ /app
 # Устанавливаем все зависимости
-RUN apk update && apk add gcc && apk add libc-dev && apk add libffi-dev && pip3 install -r /app/requirements.txt --no-cache-dir
+RUN apt-get update && apt-get install -y gcc && apt-get install -y libc-dev && apt-get install -y libffi-dev && pip3 install -r /app/requirements.txt --no-cache-dir
 # Устанавливаем приложение (Подробнее смотри Distutils)
 RUN pip3 install -e /app
+RUN pip3 install ndg-httpsclient
+RUN pip3 install pyopenssl
+RUN pip3 install pyasn1
 # Говорим контейнеру какой порт слушай
 #EXPOSE 8088
 # Запуск нашего приложения при старте контейнера
