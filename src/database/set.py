@@ -195,6 +195,8 @@ def add_instagram_story_to_instagram_user(story: InstagramStory, telegram_user_i
     file_id = None
     if hasattr(files, 'file_id'):
         file_id = files.file_id
+    if isinstance(files, list):
+        file_id = files[-1].file_id
     if exists_story is None:
         created_story, created = InstagramStory.get_or_create(
             pk=story.pk,
@@ -222,6 +224,8 @@ def add_instagram_highlight_to_instagram_user(highlight, telegram_user_id, files
     file_id = None
     if hasattr(files, 'file_id'):
         file_id = files.file_id
+    if isinstance(files, list):
+        file_id = files[-1].file_id
     if exists_highlight is None:
         created_highlight, created = InstagramHighlight.get_or_create(
             pk=highlight.pk,

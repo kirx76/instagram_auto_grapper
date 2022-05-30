@@ -214,9 +214,9 @@ def check_instagram_account_validity(instagram_account, bot: telebot.TeleBot, te
                 msg = bot.send_message(telegram_user_id,
                                        'You have 1 minute to write your verification code in next message')
                 bot.register_next_step_handler(msg, process_challenge_code_handler, username)
-                time.sleep(60)
                 bot.delete_message(chat_id=msg.chat.id, message_id=msg.message_id)
                 bot.send_message(telegram_user_id, 'Wait for check')
+                time.sleep(60)
                 if code and code.isdigit():
                     break
             return code
