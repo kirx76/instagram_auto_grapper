@@ -23,6 +23,21 @@ TG_BOT_API_URL = os.environ.get("TG_BOT_API_URL")
 TG_BOT_TOKEN = os.environ.get("TG_BOT_TOKEN")
 
 
+def send_file(file_id, bot: TeleBot, message):
+    time.sleep(1)
+    file_url = bot.get_file_url(file_id)
+    if 'videos' in file_url:
+        bot.send_video(message.chat.id, video=file_id)
+    elif 'photos' in file_url:
+        bot.send_photo(message.chat.id, photo=file_id)
+    else:
+        mt = mimetypes.guess_type(file_url)
+        if mt[0] == 'video/mp4':
+            bot.send_video(message.chat.id, video=file_id)
+        else:
+            bot.send_photo(message.chat.id, photo=file_id)
+
+
 def get_sent_files(bot: TeleBot, message, instagram_user, target):
     try:
         inst(f'Current target for sent files: {instagram_user.username}')
@@ -32,24 +47,23 @@ def get_sent_files(bot: TeleBot, message, instagram_user, target):
             for post in posts:
                 try:
                     if post.telegram_file_id is not None:
-                        time.sleep(1)
-                        file_url = bot.get_file_url(post.telegram_file_id)
-                        mt = mimetypes.guess_type(file_url)
-                        if mt[0] == 'video/mp4':
-                            bot.send_video(message.chat.id, video=post.telegram_file_id)
-                        else:
-                            bot.send_photo(message.chat.id, photo=post.telegram_file_id)
+                        send_file(post.telegram_file_id, bot, message)
                     else:
                         time.sleep(1)
                         data = []
                         resource_list = get_instagram_post_resources_with_file_id_by_instagram_post(post)
                         for resource in resource_list:
                             file_url = bot.get_file_url(resource.telegram_file_id)
-                            mt = mimetypes.guess_type(file_url)
-                            if mt[0] == 'video/mp4':
+                            if 'videos' in file_url:
                                 data.append(InputMediaVideo(resource.telegram_file_id))
-                            else:
+                            elif 'photos' in file_url:
                                 data.append(InputMediaPhoto(resource.telegram_file_id))
+                            else:
+                                mt = mimetypes.guess_type(file_url)
+                                if mt[0] == 'video/mp4':
+                                    data.append(InputMediaVideo(resource.telegram_file_id))
+                                else:
+                                    data.append(InputMediaPhoto(resource.telegram_file_id))
                         bot.send_media_group(message.chat.id, data)
                 except Exception as e:
                     err(f'{post}{e}')
@@ -59,13 +73,7 @@ def get_sent_files(bot: TeleBot, message, instagram_user, target):
             stories = get_instagram_stories_with_file_id_by_instagram_user(instagram_user)
             for story in stories:
                 try:
-                    time.sleep(1)
-                    file_url = bot.get_file_url(story.telegram_file_id)
-                    mt = mimetypes.guess_type(file_url)
-                    if mt[0] == 'video/mp4':
-                        bot.send_video(message.chat.id, video=story.telegram_file_id)
-                    else:
-                        bot.send_photo(message.chat.id, photo=story.telegram_file_id)
+                    send_file(story.telegram_file_id, bot, message)
                 except Exception as e:
                     err(f'{story}{e}')
                     pass
@@ -74,18 +82,12 @@ def get_sent_files(bot: TeleBot, message, instagram_user, target):
             highlights = get_instagram_highlights_with_file_id_by_instagram_user(instagram_user)
             for highlight in highlights:
                 try:
-                    time.sleep(1)
-                    file_url = bot.get_file_url(highlight.telegram_file_id)
-                    mt = mimetypes.guess_type(file_url)
-                    if mt[0] == 'video/mp4':
-                        bot.send_video(message.chat.id, video=highlight.telegram_file_id)
-                    else:
-                        bot.send_photo(message.chat.id, photo=highlight.telegram_file_id)
+                    send_file(highlight.telegram_file_id, bot, message)
                 except Exception as e:
                     err(f'{highlight}{e}')
                     pass
 
-        bot.send_message(message.chat.id, 'Done', reply_markup=user_selected_instagram_user_markup(message.chat.id))
+        bot.send_message(message.chat.id, 'Done', reply_markup=user_selected_instagram_user_markup(instagram_user))
 
     except Exception as e:
         err(e)
@@ -96,7 +98,8 @@ def get_media(bot: TeleBot, message, instagram_user, target):
     try:
         inst(f'Current target: {instagram_user.username}')
         active_instagram_account = get_telegram_user_active_instagram_account(message.chat.id)
-        valid_instagram_account = initialize_valid_instagram_account(active_instagram_account, bot, message.chat.id, save_instagram_account_dump_data)
+        valid_instagram_account = initialize_valid_instagram_account(active_instagram_account, bot, message.chat.id,
+                                                                     save_instagram_account_dump_data)
 
         if target == 'posts':
             new_posts = get_new_posts(instagram_user, valid_instagram_account)

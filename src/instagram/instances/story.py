@@ -1,10 +1,13 @@
+import time
+
+from instagrapi.exceptions import PleaseWaitFewMinutes
 from instagrapi.types import Story
 
 from bot.markups.markups import user_selected_instagram_user_markup
 from database.database import InstagramStory
 from database.set import add_instagram_story_to_instagram_user
 from instagram.downloads import download_and_send_story
-from utils.misc import BColors, divider, create_folder_by_username, inst, err
+from utils.misc import BColors, divider, create_folder_by_username, inst, err, oss
 
 
 def grap_stories(bot, message, instagram_user, cl, pks):
@@ -24,6 +27,10 @@ def grap_stories(bot, message, instagram_user, cl, pks):
         bot.send_message(message.chat.id,
                          f'Collection complete\n\nSelected: {instagram_user.username}',
                          reply_markup=user_selected_instagram_user_markup(instagram_user))
+    except PleaseWaitFewMinutes as e:
+        err(e)
+        oss('Sleep 300 s')
+        time.sleep(300)
     except Exception as e:
         err(e)
         bot.send_message(message.chat.id, e)
