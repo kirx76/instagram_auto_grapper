@@ -28,6 +28,7 @@ BOTO3_SECRET_KEY = os.environ.get("BOTO3_SECRET_KEY")
 BOTO3_SESSION_TOKEN = os.environ.get("BOTO3_SESSION_TOKEN")
 BOTO3_BUCKET_NAME = os.environ.get("BOTO3_BUCKET_NAME")
 BOTO3_ENDPOINT_URL = os.environ.get("BOTO3_ENDPOINT_URL")
+PROXY = os.environ.get("PROXY")
 
 
 class BColors:
@@ -227,35 +228,8 @@ def check_instagram_account_validity(instagram_account, bot: telebot.TeleBot, te
     try:
         cl = Client()
         cl.challenge_code_handler = challenge_code_handler
-        # cl.set_proxy("socks5://47.252.3.228:21016")
-        # cl.set_proxy("socks5://167.71.171.243:80")
-        cl.set_proxy("socks5://44.233.12.234:1080")
-        cl.set_proxy("socks5://104.160.189.3:80")
-        cl.set_proxy("socks5://164.155.147.31:80")
-        cl.set_proxy("socks5://185.212.170.206:65080")
-        cl.set_proxy("socks5://3.12.140.194:80")
-        cl.set_proxy("socks5://37.57.15.43:33761")
-        cl.set_proxy("socks5://49.207.36.81:80")
-        cl.set_proxy("socks5://124.158.167.26:8080")
-        cl.set_proxy("socks5://139.255.77.74:8080")
-        cl.set_proxy("socks5://71.14.214.67:8080")
-        cl.set_proxy("socks5://200.172.255.195:8080")
-        cl.set_proxy("socks5://164.155.147.1:80")
-        cl.set_proxy("socks5://140.83.85.172:80")
-        cl.set_proxy("socks5://164.155.150.31:80")
-        cl.set_proxy("socks5://164.155.151.31:80")
-        cl.set_proxy("socks5://142.11.222.22:80")
-        cl.set_proxy("socks5://41.77.7.234:3129")
-        cl.set_proxy("socks5://103.136.36.10:8080")
-        cl.set_proxy("socks5://164.155.149.1:80")
-        cl.set_proxy("socks5://151.106.18.123:1080")
-        cl.set_proxy("socks5://125.228.43.81:8080")
-        cl.set_proxy("socks5://164.155.151.1:80")
-        cl.set_proxy("socks5://196.1.95.117:80")
-        cl.set_proxy("socks5://161.35.161.38:80")
-        cl.set_proxy("socks5://164.155.148.1:80")
-        cl.set_proxy("socks5://164.155.145.0:80")
-        cl.set_proxy("socks5://216.137.184.253:80")
+        if PROXY is not None:
+            cl.set_proxy(PROXY)
         dump_data = instagram_account.dump_data
         if dump_data is None:
             oss(f'No dump for user {instagram_account.username}')
