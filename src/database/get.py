@@ -116,3 +116,23 @@ def get_instagram_stories_with_file_id_by_instagram_user(instagram_user: Instagr
 def get_instagram_highlights_with_file_id_by_instagram_user(instagram_user: InstagramUser) -> list[InstagramHighlight]:
     return InstagramHighlight.select().where(
         (InstagramHighlight.user == instagram_user.pk) & (InstagramHighlight.telegram_file_id != '')).execute()
+
+
+def get_selected_instagram_user_story_by_page(telegram_user: TelegramUser, page: int) -> InstagramStory:
+    selected_instagram_user = get_selected_instagram_user(telegram_user.user_id)
+    return InstagramStory.select().join(InstagramUser).where(
+        (InstagramUser.added_by == telegram_user.id) & (InstagramStory.user == selected_instagram_user) & (
+                    InstagramStory.telegram_file_id != '')).order_by(
+        InstagramStory.taken_at).paginate(page, 1).first()
+
+
+def get_selected_instagram_user_post_by_page(telegram_user: TelegramUser, page: int) -> InstagramPost:
+    return InstagramPost.select().join(InstagramUser).where(
+        InstagramUser.added_by == telegram_user.id).order_by(
+        InstagramPost.taken_at
+    ).paginate(page, 1).first()
+
+
+def get_instagram_post_resources_by_post(instagram_post: InstagramPost) -> list[
+    InstagramPostResource]:
+    return InstagramPostResource.select().where(InstagramPostResource.post_id == instagram_post.id).execute()

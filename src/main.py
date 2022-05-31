@@ -7,7 +7,8 @@ from bot.instagram_account_logic import user_add_instagram_account, user_instagr
     user_select_instagram_account, user_instagram_account_change_active, user_instagram_account_check_status, \
     user_delete_instagram_account
 from bot.instagram_user_logic import user_instagram_users, user_add_instagram_user, \
-    user_select_instagram_user, user_instagram_user_change_active, user_instagram_user_get, user_instagram_user_get_sent
+    user_select_instagram_user, user_instagram_user_change_active, user_instagram_user_get, \
+    user_instagram_user_get_sent, instagram_user_interactive_menu, instagram_user_interactive_menu_data
 from bot.main import send_start, user_main_menu, antispam_func, AdminFilter, main_scheduler, DownloadingFilter, \
     BannedFilter, UsualFilter, NormalFilter, VIPFilter, characters_page_callback
 from database.database import initialize_db
@@ -22,6 +23,16 @@ bot = initialize_telegram_bot(threads=5)
 def register_main_handlers():
     bot.register_message_handler(send_start, commands=['start'], banned=False, pass_bot=True)
     bot.register_callback_query_handler(user_main_menu, func=lambda call: call.data == 'user_main_menu', banned=False,
+                                        pass_bot=True)
+
+
+def register_interactive_menu():
+    bot.register_callback_query_handler(instagram_user_interactive_menu,
+                                        downloading=False, banned=False,
+                                        func=lambda call: call.data == 'instagram_user_interactive_menu', pass_bot=True)
+    bot.register_callback_query_handler(instagram_user_interactive_menu_data,
+                                        downloading=False, banned=False,
+                                        func=lambda call: 'instagram_user_interactive_menu:' in call.data,
                                         pass_bot=True)
 
 
@@ -108,6 +119,9 @@ register_main_handlers()
 register_admin_handlers()
 register_middlewares()
 register_custom_filters()
+register_interactive_menu()
+
+
 register_grapper_thread()
 
 

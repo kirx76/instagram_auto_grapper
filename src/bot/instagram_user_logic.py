@@ -1,11 +1,43 @@
 from telebot import TeleBot
 from telebot.types import CallbackQuery, Message
 
-from bot.markups.markups import user_instagram_users_markup, user_selected_instagram_user_markup
-from database.get import select_instagram_user, get_selected_instagram_user
+from bot.markups.markups import user_instagram_users_markup, user_selected_instagram_user_markup, \
+    selected_instagram_user_interactive_markup
+from database.get import select_instagram_user, get_selected_instagram_user, get_current_telegram_user, \
+    get_selected_instagram_user_story_by_page
 from database.set import toggle_selected_active_instagram_user, add_instagram_user
-from instagram.main import get_media, get_sent_files
+from instagram.main import get_media, get_sent_files, send_file
 from utils.misc import get_username_from_url
+
+
+def instagram_user_interactive_menu_data(call: CallbackQuery, bot: TeleBot):
+    telegram_user = get_current_telegram_user(call.message.chat.id)
+    selected_data = call.data.partition('instagram_user_interactive_menu:')[2]
+    print(selected_data)
+    if selected_data == 'stories':
+        story = get_selected_instagram_user_story_by_page(telegram_user, 1)
+        send_file(story.telegram_file_id, bot, call.message)
+    elif selected_data == 'posts':
+        pass
+    elif selected_data == 'highlights':
+        pass
+    # post = get_selected_instagram_user_post_by_page(telegram_user, 1)
+    # if post.telegram_file_id is None:
+    #     print('POST WITH RESOURCES')
+    #     resources = get_instagram_post_resources_by_post(post)
+    #     for resource in resources:
+    #         print(resource.pk)
+    # else:
+    #     print('SIMPLE POST')
+    #     print(post.pk)
+    # print(s)
+
+
+def instagram_user_interactive_menu(call: CallbackQuery, bot: TeleBot):
+    selected = get_selected_instagram_user(call.message.chat.id)
+    bot.delete_message(call.message.chat.id, call.message.message_id)
+    bot.send_photo(chat_id=call.message.chat.id, photo=selected.profile_pic_location,
+                   reply_markup=selected_instagram_user_interactive_markup(selected))
 
 
 def user_instagram_users(call: CallbackQuery, bot: TeleBot):

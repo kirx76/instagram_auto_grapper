@@ -9,7 +9,8 @@ import boto3
 import telebot
 from dotenv import load_dotenv
 from instagrapi import Client
-from instagrapi.exceptions import ClientLoginRequired, LoginRequired, TwoFactorRequired, PleaseWaitFewMinutes
+from instagrapi.exceptions import ClientLoginRequired, LoginRequired, TwoFactorRequired, PleaseWaitFewMinutes, \
+    ChallengeRequired
 
 logger = getLogger('__main__')
 logger.setLevel(DEBUG)
@@ -242,7 +243,8 @@ def check_instagram_account_validity(instagram_account, bot: telebot.TeleBot, te
             if two_factor_code is None:
                 cl.login(instagram_account.username, instagram_account.password, relogin=relogin)
             else:
-                cl.login(instagram_account.username, instagram_account.password, verification_code=two_factor_code, relogin=relogin)
+                cl.login(instagram_account.username, instagram_account.password, verification_code=two_factor_code,
+                         relogin=relogin)
         try:
             cl.get_timeline_feed()
             inst('Saving authorization dump')
@@ -274,6 +276,12 @@ def check_instagram_account_validity(instagram_account, bot: telebot.TeleBot, te
     except PleaseWaitFewMinutes as e:
         err(e)
         time.sleep(60)
+    except ChallengeRequired as e:
+        err(e)
+        s = cl.challenge_resolve(cl.last_json)
+        print('SSSSSSS', s)
+        d = cl.get_timeline_feed()
+        print(d)
     except Exception as e:
         err(e)
     return False

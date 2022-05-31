@@ -3,7 +3,7 @@ import math
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from telegram_bot_pagination import InlineKeyboardPaginator
 
-from database.database import InstagramPost, InstagramStory, InstagramHighlight, InstagramPostResource
+from database.database import InstagramPost, InstagramStory, InstagramHighlight, InstagramPostResource, InstagramUser
 from database.get import get_current_telegram_user, get_instagram_accounts_by_telegram_user_id, \
     get_telegram_user_instagram_users, get_telegram_user_instagram_users_paginated
 
@@ -67,6 +67,14 @@ def user_instagram_users_markup(telegram_user, page):
     return paginator.markup
 
 
+def selected_instagram_user_interactive_markup(instagram_user: InstagramUser):
+    markup = InlineKeyboardMarkup()
+    markup.add(InlineKeyboardButton('Posts', callback_data='instagram_user_interactive_menu:posts'),
+               InlineKeyboardButton('Stories', callback_data='instagram_user_interactive_menu:stories'),
+               InlineKeyboardButton('Highlights', callback_data='instagram_user_interactive_menu:highlights'))
+    return markup
+
+
 def user_selected_instagram_user_markup(instagram_user):
     markup = InlineKeyboardMarkup()
     posts_count = instagram_user.posts.select().count()
@@ -95,5 +103,6 @@ def user_selected_instagram_user_markup(instagram_user):
                              callback_data='user_instagram_user_get_sent:stories'),
         InlineKeyboardButton(f"Saved: {highlights_count_sent}",
                              callback_data='user_instagram_user_get_sent:highlights'))
+    markup.add(InlineKeyboardButton("Interactive menu", callback_data='instagram_user_interactive_menu'))
     markup.add(InlineKeyboardButton("Instagram users menu", callback_data='user_instagram_users'))
     return markup
