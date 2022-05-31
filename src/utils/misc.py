@@ -230,6 +230,7 @@ def check_instagram_account_validity(instagram_account, bot: telebot.TeleBot, te
         cl.challenge_code_handler = challenge_code_handler
         if PROXY is not None:
             cl.set_proxy(PROXY)
+
         dump_data = instagram_account.dump_data
         if dump_data is None:
             oss(f'No dump for user {instagram_account.username}')
