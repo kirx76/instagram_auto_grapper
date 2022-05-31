@@ -2,6 +2,7 @@ import mimetypes
 import time
 from logging import getLogger, DEBUG, FileHandler, Formatter
 
+from instagrapi.exceptions import PleaseWaitFewMinutes
 from telebot import TeleBot
 from telebot.types import InputMediaPhoto, InputMediaVideo
 
@@ -34,6 +35,10 @@ def download_and_send_highlight(bot: TeleBot, highlight, message, username, cl):
             cleanup_downloaded_file_by_filepath(downloaded_highlight_path)
             return True, sent.video
         return False
+    except PleaseWaitFewMinutes as e:
+        err(e)
+        time.sleep(300)
+        return False, False
     except Exception as e:
         err(f'Тут снова ошибка ебаная на хайлайтах при загрузке, чекай: {e}')
         return True, highlight
@@ -55,6 +60,10 @@ def download_and_send_story(bot: TeleBot, story, message, username, cl):
             cleanup_downloaded_file_by_filepath(downloaded_story_path)
             return True, sent.video
         return False
+    except PleaseWaitFewMinutes as e:
+        err(e)
+        time.sleep(300)
+        return False, False
     except Exception as e:
         err(f'Тут снова ошибка ебаная на сторисах при загрузке, чекай: {e}')
         return True, story
