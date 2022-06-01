@@ -5,16 +5,16 @@ on:
     branches:
       - 'master'
 jobs:
-  #  run_build:
-  #    runs-on: [ubuntu-latest]
-  #    steps:
-  #      - uses: actions/checkout@master
-  #      - uses: actions/setup-python@v1
-  #        with:
-  #          python-version: '3.10'
-  #          architecture: 'x64'
-  #      - name: Install requirements
-  #        run: pip install -r requirements.txt
+  run_build:
+    runs-on: [ ubuntu-latest ]
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-python@v1
+        with:
+          python-version: '3.10'
+          architecture: 'x64'
+      - name: Install requirements
+        run: pip install -r requirements.txt
 
   #  build_and_pub:
   #    needs: [run_build]
@@ -43,10 +43,10 @@ jobs:
   #        run: docker push $LOGIN/$NAME
 
   deploy:
-#    needs: [ build_and_pub ]
+    needs: [ run_build ]
     runs-on: [ ubuntu-latest ]
     steps:
-      - name: Set tag to env
-        run: echo ::set-env name=RELEASE_VERSION:${GITHUB_REF:11}
+      #      - name: Set tag to env
+      #        run: echo ::set-env name=RELEASE_VERSION:${GITHUB_REF:11}
       - name: Send webhook for deploy
         run: 'curl --location --show-error --silent --fail --request POST "${{ secrets.DEPLOYMENT_SERVER }}" -H "Authorization: ${{ secrets.DEPLOYMENT_TOKEN }}" -H "Content-Type: application/json"'

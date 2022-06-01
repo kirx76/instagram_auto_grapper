@@ -1,5 +1,5 @@
 from database.database import TelegramUser, InstagramAccount, InstagramUser, InstagramStory, \
-    InstagramHighlight, TelegramUserInstagramUsers
+    InstagramHighlight, TelegramUserInstagramUsers, InstagramPost, InstagramPostResource
 from utils.misc import dbm
 
 
@@ -95,6 +95,24 @@ def get_current_telegram_user(user_id) -> TelegramUser:
 
 def get_instagram_user_by_username(username: str) -> InstagramUser:
     return InstagramUser.select().where(InstagramUser.username == username).first()
+
+
+def get_iu_posts_by_page(instagram_user: InstagramUser, page: int) -> InstagramPost:
+    return InstagramPostResource.select().join(InstagramPost).join(InstagramUser).where(
+        InstagramUser.pk == instagram_user.pk).order_by(
+        InstagramPost.taken_at).paginate(page, 1).first()
+
+
+def get_iu_posts_count(instagram_user: InstagramUser) -> int:
+    return InstagramPostResource.select().join(InstagramPost).join(InstagramUser).where(
+        InstagramUser.pk == instagram_user.pk).order_by(
+        InstagramPost.taken_at).count()
+
+
+def get_iu_post_resources(instagram_post: InstagramPost) -> list[InstagramPostResource]:
+    return InstagramPostResource.select().join(InstagramPost).where(
+        (InstagramPost.pk == instagram_post.pk) & (InstagramPostResource.telegram_file_id != '')
+    ).execute()
 
 
 def get_iu_stories_by_page(instagram_user: InstagramUser, page: int) -> InstagramStory:

@@ -4,7 +4,7 @@ from telebot.types import CallbackQuery, Message
 from bot.markups.markups import user_instagram_users_markup, iu_i_menu_markup, \
     iu_i_page_markup
 from database.get import get_instagram_user_by_username, \
-    get_iu_highlights_by_page, get_iu_stories_by_page
+    get_iu_highlights_by_page, get_iu_stories_by_page, get_iu_posts_by_page
 from database.set import add_instagram_user, toggle_iu_active
 from instagram.main import get_media, resend_file
 from utils.misc import get_username_from_url, caption_for_interactive_menu
@@ -63,6 +63,10 @@ def iu_i_page(call: CallbackQuery, bot: TeleBot):
     elif target == 'stories' and instagram_user.stories.select().count() > 0:
         story = get_iu_stories_by_page(instagram_user, int(page))
         resend_file(story.telegram_file_id, bot, call.message,
+                    reply_markup=iu_i_page_markup(instagram_user, target, int(page)))
+    elif target == 'posts' and instagram_user.posts.select().count() > 0:
+        post_resource = get_iu_posts_by_page(instagram_user, int(page))
+        resend_file(post_resource.telegram_file_id, bot, call.message,
                     reply_markup=iu_i_page_markup(instagram_user, target, int(page)))
 
 

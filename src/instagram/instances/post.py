@@ -23,9 +23,9 @@ def grap_posts(bot, message, instagram_user, cl, pks):
                 download_post(bot, post, message, instagram_user, cl)
 
         inst(f'Grepping {BColors.OKCYAN}posts{BColors.ENDC} complete')
-        bot.send_message(message.chat.id,
-                         f'Collection complete\n\nSelected: {instagram_user.username}',
-                         reply_markup=iu_i_menu_markup(instagram_user))
+        bot.send_photo(chat_id=message.chat.id, photo=instagram_user.profile_pic_location,
+                       reply_markup=iu_i_menu_markup(instagram_user),
+                       caption='Collection complete')
     except PleaseWaitFewMinutes as e:
         err(e)
         oss('Sleep 300 s')

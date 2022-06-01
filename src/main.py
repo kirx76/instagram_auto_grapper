@@ -102,6 +102,4 @@ def run():
     bot.infinity_polling()
 
 
-# test cicd
-
 run()

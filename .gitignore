@@ -12,3 +12,4 @@ venv
 /dev.db
 /src/logs.txt
 /src/logs_debug.txt
+/blank.py

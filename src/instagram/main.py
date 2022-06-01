@@ -57,8 +57,6 @@ def get_media(bot: TeleBot, message, instagram_user, target):
                 bot.send_photo(chat_id=message.chat.id, photo=instagram_user.profile_pic_location,
                                reply_markup=iu_i_menu_markup(instagram_user),
                                caption='No new posts')
-                # bot.edit_message_text('No new posts', message.chat.id, message.message_id,
-                #                       reply_markup=iu_i_menu_markup(instagram_user))
 
         if target == 'stories':
             new_stories = get_new_stories(instagram_user, valid_instagram_account)
@@ -82,8 +80,6 @@ def get_media(bot: TeleBot, message, instagram_user, target):
                 bot.send_photo(chat_id=message.chat.id, photo=instagram_user.profile_pic_location,
                                reply_markup=iu_i_menu_markup(instagram_user),
                                caption='No new highlights')
-                # bot.edit_message_text('No new highlights', message.chat.id, message.message_id,
-                #                       reply_markup=iu_i_menu_markup(instagram_user))
     except Exception as e:
         err(e)
         bot.send_message(message.chat.id, e)

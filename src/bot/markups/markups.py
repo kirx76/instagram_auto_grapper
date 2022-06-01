@@ -5,22 +5,18 @@ from telegram_bot_pagination import InlineKeyboardPaginator
 
 from database.get import get_current_telegram_user, get_instagram_accounts_by_telegram_user_id, \
     get_telegram_user_instagram_users, get_telegram_user_instagram_users_paginated, get_iu_highlights_count, \
-    get_iu_stories_count
+    get_iu_stories_count, get_iu_posts_count
 
 TEXTS = {
 }
 
 
 def main_menu_markup(telegram_user_id):
-    telegram_user = get_current_telegram_user(telegram_user_id)
     markup = InlineKeyboardMarkup()
     markup.add(InlineKeyboardButton("Instagram accounts", callback_data='user_instagram_accounts'))
-    telegram_user_instagram_users_all = get_telegram_user_instagram_users(telegram_user)
+    telegram_user_instagram_users_all = get_telegram_user_instagram_users(telegram_user_id)
     if len(telegram_user_instagram_users_all) > 0:
         markup.add(InlineKeyboardButton("Instagram users", callback_data='user_instagram_users'))
-    # TODO WEB APPLICATION INITIALIZATION
-    # markup.add(
-    #     InlineKeyboardButton(text='hui', web_app=WebAppInfo(url="https://5caf-146-70-108-88.ngrok.io")))
     return markup
 
 
@@ -61,7 +57,7 @@ def iu_i_page_markup(instagram_user, target, page):
     elif target == 'stories':
         count = get_iu_stories_count(instagram_user)
     elif target == 'posts':
-        count = 0
+        count = get_iu_posts_count(instagram_user)
     else:
         print('PIZDOS')
         return

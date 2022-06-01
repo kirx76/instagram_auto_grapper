@@ -164,6 +164,7 @@ fullname: <b>{instagram_user.full_name}</b>
 enabled: <b>{"Yes" if instagram_user.enabled else "No"}</b>
 is_private: <b>{"Yes" if instagram_user.is_private else "No"}</b>
 added_by: <b>{instagram_user.added_by.username}</b>
+added_at: <b>{instagram_user.added_at.strftime("%Y-%m-%d %H:%M:%S")}</b>
 '''
     return text
 

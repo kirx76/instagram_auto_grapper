@@ -3,6 +3,7 @@ import os
 
 from dotenv import load_dotenv
 from peewee import *
+from playhouse.migrate import PostgresqlMigrator, migrate
 from playhouse.postgres_ext import PostgresqlExtDatabase
 
 from utils.misc import dbm
@@ -107,6 +108,7 @@ class InstagramUser(BaseModel):
     added_by = ForeignKeyField(TelegramUser, backref='instagram_users')
     profile_pic_location = TextField(null=True)
     available_for = ManyToManyField(TelegramUser, 'instagram_users')
+    added_at = DateTimeField(default=datetime.datetime.now)
 
 
 TelegramUserInstagramUsers = InstagramUser.available_for.get_through_model()
