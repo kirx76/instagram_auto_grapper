@@ -11,10 +11,13 @@ TEXTS = {
 }
 
 
-def main_menu_markup():
+def main_menu_markup(telegram_user_id):
+    telegram_user = get_current_telegram_user(telegram_user_id)
     markup = InlineKeyboardMarkup()
     markup.add(InlineKeyboardButton("Instagram accounts", callback_data='user_instagram_accounts'))
-    markup.add(InlineKeyboardButton("Instagram users", callback_data='user_instagram_users'))
+    telegram_user_instagram_users_all = get_telegram_user_instagram_users(telegram_user)
+    if len(telegram_user_instagram_users_all) > 0:
+        markup.add(InlineKeyboardButton("Instagram users", callback_data='user_instagram_users'))
     # TODO WEB APPLICATION INITIALIZATION
     # markup.add(
     #     InlineKeyboardButton(text='hui', web_app=WebAppInfo(url="https://5caf-146-70-108-88.ngrok.io")))

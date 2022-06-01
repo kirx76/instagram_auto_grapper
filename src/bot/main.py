@@ -19,12 +19,12 @@ from utils.misc import err, inst, initialize_valid_instagram_account, PseudoTele
 
 def send_start(message: Message, bot: TeleBot):
     create_db_telegram_user(message.from_user.username, message.from_user.id)
-    bot.send_message(message.chat.id, 'Welcome', reply_markup=main_menu_markup())
+    bot.send_message(message.chat.id, 'Welcome', reply_markup=main_menu_markup(message.chat.id))
 
 
 def user_main_menu(call: CallbackQuery, bot: TeleBot):
     bot.edit_message_text('Main menu', call.message.chat.id, call.message.message_id,
-                          reply_markup=main_menu_markup())
+                          reply_markup=main_menu_markup(call.message.chat.id))
 
 
 def characters_page_callback(call, bot):
