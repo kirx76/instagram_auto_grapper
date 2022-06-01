@@ -157,6 +157,17 @@ def caption_text_to_db(media):
     return text
 
 
+def caption_for_interactive_menu(instagram_user):
+    text = f'''
+username: <b>{instagram_user.username}</b>
+fullname: <b>{instagram_user.full_name}</b>
+enabled: <b>{"Yes" if instagram_user.enabled else "No"}</b>
+is_private: <b>{"Yes" if instagram_user.is_private else "No"}</b>
+added_by: <b>{instagram_user.added_by.username}</b>
+'''
+    return text
+
+
 def collect_caption_to_send(media, username):
     text = f'username: #{username}'
     if hasattr(media, 'taken_at'):
@@ -228,8 +239,8 @@ def check_instagram_account_validity(instagram_account, bot: telebot.TeleBot, te
     try:
         cl = Client()
         cl.challenge_code_handler = challenge_code_handler
-        if PROXY is not None:
-            cl.set_proxy(PROXY)
+        # if PROXY is not None:
+        #     cl.set_proxy(PROXY)
 
         dump_data = instagram_account.dump_data
         if dump_data is None:

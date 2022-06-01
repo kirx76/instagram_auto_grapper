@@ -31,7 +31,7 @@ def initialize_db():
     db.create_tables(
         [TelegramUser, TelegramUserStatus, InstagramUser,
          InstagramAccount, InstagramPost, InstagramPostResource,
-         InstagramHighlight, InstagramStory])
+         InstagramHighlight, InstagramStory, TelegramUserInstagramUsers])
     db.close()
     initialize_user_statuses()
     dbm('Database initialization complete')
@@ -106,6 +106,10 @@ class InstagramUser(BaseModel):
     enabled = BooleanField(default=False)
     added_by = ForeignKeyField(TelegramUser, backref='instagram_users')
     profile_pic_location = TextField(null=True)
+    available_for = ManyToManyField(TelegramUser, 'instagram_users')
+
+
+TelegramUserInstagramUsers = InstagramUser.available_for.get_through_model()
 
 
 class InstagramPost(BaseModel):

@@ -1,5 +1,5 @@
-from database.database import TelegramUser, InstagramAccount, InstagramUser, InstagramPost, InstagramStory, \
-    InstagramHighlight, InstagramPostResource
+from database.database import TelegramUser, InstagramAccount, InstagramUser, InstagramStory, \
+    InstagramHighlight, TelegramUserInstagramUsers
 from utils.misc import dbm
 
 
@@ -24,11 +24,6 @@ def get_active_instagram_account_by_instagram_user(instagram_user) -> InstagramA
                 InstagramAccount.is_valid == True)).first()
 
 
-def get_all_instagram_accounts_for_admin() -> list[InstagramAccount]:
-    dbm('Get all instagram accounts for admin')
-    return InstagramAccount.select().execute()
-
-
 def get_enabled_instagram_users() -> list[InstagramUser]:
     dbm('Getting all enabled instagram users')
     return InstagramUser.select().where(InstagramUser.enabled == True).order_by(InstagramUser.username).execute()
@@ -44,15 +39,30 @@ def get_telegram_user_active_instagram_account(user_id) -> InstagramAccount:
 def get_telegram_user_instagram_users_paginated(user_id, page) -> list[InstagramUser]:
     telegram_user = get_current_telegram_user(user_id)
     dbm('Getting telegram user instagram users')
-    return InstagramUser.select().where(InstagramUser.added_by == telegram_user.id).order_by(
+    return InstagramUser.select().join(TelegramUserInstagramUsers).where(
+        (TelegramUserInstagramUsers.telegramuser_id == telegram_user) | (
+                InstagramUser.added_by == telegram_user.id)).order_by(
         InstagramUser.username).paginate(
         page, 5).execute()
+
+
+def check_telegram_user_in_instagram_user(instagram_user, telegram_user):
+    instagram_user_available_for = TelegramUserInstagramUsers.select().join(TelegramUser).where(
+        (TelegramUserInstagramUsers.instagramuser_id == instagram_user) & (
+                TelegramUserInstagramUsers.telegramuser_id == telegram_user)).first()
+    if instagram_user_available_for is None:
+        return False
+    else:
+        return True
 
 
 def get_telegram_user_instagram_users(user_id) -> list[InstagramUser]:
     telegram_user = get_current_telegram_user(user_id)
     dbm('Getting telegram user instagram users')
-    return InstagramUser.select().where(InstagramUser.added_by == telegram_user.id).execute()
+    return InstagramUser.select().join(TelegramUserInstagramUsers).where(
+        (TelegramUserInstagramUsers.telegramuser_id == telegram_user) | (
+                InstagramUser.added_by == telegram_user.id)).order_by(
+        InstagramUser.username).execute()
 
 
 def get_instagram_accounts_by_telegram_user_id(user_id) -> list[InstagramAccount]:
@@ -62,28 +72,12 @@ def get_instagram_accounts_by_telegram_user_id(user_id) -> list[InstagramAccount
         (InstagramAccount.added_by == telegram_user.id) & (InstagramAccount.is_deleted == False)).execute()
 
 
-def select_instagram_user(username, user_id):
-    telegram_user = get_current_telegram_user(user_id)
-    dbm('Selecting instagram user')
-    telegram_user.selected_instagram_user = username
-    telegram_user.save()
-    return get_selected_instagram_user(user_id)
-
-
 def select_instagram_account(username, user_id):
     telegram_user = get_current_telegram_user(user_id)
     dbm('Selecting instagram account')
     telegram_user.selected_instagram_account = username
     telegram_user.save()
     return get_selected_instagram_account(user_id)
-
-
-def get_selected_instagram_user(user_id) -> InstagramUser:
-    telegram_user = get_current_telegram_user(user_id)
-    dbm('Getting telegram user selected instagram user')
-    return InstagramUser.select().where(
-        (InstagramUser.username == telegram_user.selected_instagram_user) & (
-                InstagramUser.added_by == telegram_user.id)).first()
 
 
 def get_selected_instagram_account(user_id) -> InstagramAccount:
@@ -99,40 +93,29 @@ def get_current_telegram_user(user_id) -> TelegramUser:
     return TelegramUser.select().where(TelegramUser.user_id == user_id).first()
 
 
-def get_instagram_posts_with_file_id_by_instagram_user(instagram_user: InstagramUser) -> list[InstagramPost]:
-    return InstagramPost.select().where(InstagramPost.user == instagram_user.pk).execute()
+def get_instagram_user_by_username(username: str) -> InstagramUser:
+    return InstagramUser.select().where(InstagramUser.username == username).first()
 
 
-def get_instagram_post_resources_with_file_id_by_instagram_post(instagram_post: InstagramPost) -> list[
-    InstagramPostResource]:
-    return InstagramPostResource.select().join(InstagramPost).where(InstagramPost.pk == instagram_post.pk).execute()
-
-
-def get_instagram_stories_with_file_id_by_instagram_user(instagram_user: InstagramUser) -> list[InstagramStory]:
-    return InstagramStory.select().where(
-        (InstagramStory.user == instagram_user.pk) & (InstagramStory.telegram_file_id != '')).execute()
-
-
-def get_instagram_highlights_with_file_id_by_instagram_user(instagram_user: InstagramUser) -> list[InstagramHighlight]:
-    return InstagramHighlight.select().where(
-        (InstagramHighlight.user == instagram_user.pk) & (InstagramHighlight.telegram_file_id != '')).execute()
-
-
-def get_selected_instagram_user_story_by_page(telegram_user: TelegramUser, page: int) -> InstagramStory:
-    selected_instagram_user = get_selected_instagram_user(telegram_user.user_id)
+def get_iu_stories_by_page(instagram_user: InstagramUser, page: int) -> InstagramStory:
     return InstagramStory.select().join(InstagramUser).where(
-        (InstagramUser.added_by == telegram_user.id) & (InstagramStory.user == selected_instagram_user) & (
-                    InstagramStory.telegram_file_id != '')).order_by(
+        (InstagramStory.user == instagram_user) & (InstagramStory.telegram_file_id != '')).order_by(
         InstagramStory.taken_at).paginate(page, 1).first()
 
 
-def get_selected_instagram_user_post_by_page(telegram_user: TelegramUser, page: int) -> InstagramPost:
-    return InstagramPost.select().join(InstagramUser).where(
-        InstagramUser.added_by == telegram_user.id).order_by(
-        InstagramPost.taken_at
-    ).paginate(page, 1).first()
+def get_iu_stories_count(instagram_user: InstagramUser) -> int:
+    return InstagramStory.select().join(InstagramUser).where(
+        (InstagramStory.user == instagram_user) & (InstagramStory.telegram_file_id != '')).order_by(
+        InstagramStory.taken_at).count()
 
 
-def get_instagram_post_resources_by_post(instagram_post: InstagramPost) -> list[
-    InstagramPostResource]:
-    return InstagramPostResource.select().where(InstagramPostResource.post_id == instagram_post.id).execute()
+def get_iu_highlights_by_page(instagram_user: InstagramUser, page: int) -> InstagramHighlight:
+    return InstagramHighlight.select().join(InstagramUser).where(
+        (InstagramHighlight.user == instagram_user) & (InstagramHighlight.telegram_file_id != '')).order_by(
+        InstagramHighlight.taken_at).paginate(page, 1).first()
+
+
+def get_iu_highlights_count(instagram_user: InstagramUser) -> int:
+    return InstagramHighlight.select().join(InstagramUser).where(
+        (InstagramHighlight.user == instagram_user) & (InstagramHighlight.telegram_file_id != '')).order_by(
+        InstagramHighlight.taken_at).count()

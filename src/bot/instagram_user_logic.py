@@ -1,43 +1,69 @@
 from telebot import TeleBot
 from telebot.types import CallbackQuery, Message
 
-from bot.markups.markups import user_instagram_users_markup, user_selected_instagram_user_markup, \
-    selected_instagram_user_interactive_markup
-from database.get import select_instagram_user, get_selected_instagram_user, get_current_telegram_user, \
-    get_selected_instagram_user_story_by_page
-from database.set import toggle_selected_active_instagram_user, add_instagram_user
-from instagram.main import get_media, get_sent_files, send_file
-from utils.misc import get_username_from_url
+from bot.markups.markups import user_instagram_users_markup, iu_i_menu_markup, \
+    iu_i_page_markup
+from database.get import get_instagram_user_by_username, \
+    get_iu_highlights_by_page, get_iu_stories_by_page
+from database.set import add_instagram_user, toggle_iu_active
+from instagram.main import get_media, resend_file
+from utils.misc import get_username_from_url, caption_for_interactive_menu
 
 
-def instagram_user_interactive_menu_data(call: CallbackQuery, bot: TeleBot):
-    telegram_user = get_current_telegram_user(call.message.chat.id)
-    selected_data = call.data.partition('instagram_user_interactive_menu:')[2]
-    print(selected_data)
-    if selected_data == 'stories':
-        story = get_selected_instagram_user_story_by_page(telegram_user, 1)
-        send_file(story.telegram_file_id, bot, call.message)
-    elif selected_data == 'posts':
-        pass
-    elif selected_data == 'highlights':
-        pass
-    # post = get_selected_instagram_user_post_by_page(telegram_user, 1)
-    # if post.telegram_file_id is None:
-    #     print('POST WITH RESOURCES')
-    #     resources = get_instagram_post_resources_by_post(post)
-    #     for resource in resources:
-    #         print(resource.pk)
-    # else:
-    #     print('SIMPLE POST')
-    #     print(post.pk)
-    # print(s)
-
-
-def instagram_user_interactive_menu(call: CallbackQuery, bot: TeleBot):
-    selected = get_selected_instagram_user(call.message.chat.id)
+def iu_i_action(call: CallbackQuery, bot: TeleBot):
+    data = call.data.partition('iu_i_action:')[2]
+    select = data.split('/')
+    action = select[0]
+    instagram_user_username = select[1]
+    print(action, instagram_user_username)
     bot.delete_message(call.message.chat.id, call.message.message_id)
-    bot.send_photo(chat_id=call.message.chat.id, photo=selected.profile_pic_location,
-                   reply_markup=selected_instagram_user_interactive_markup(selected))
+    if 'download_' in action:
+        target_for_get = action.partition('download_')[2]
+        instagram_user = get_instagram_user_by_username(instagram_user_username)
+        msg = bot.send_photo(chat_id=call.message.chat.id, photo=instagram_user.profile_pic_location,
+                             caption=f'Start collecting {target_for_get}')
+        get_media(bot, msg, instagram_user, target_for_get)
+    else:
+        if action == 'activate_user':
+            toggle_iu_active(instagram_user_username, True)
+        elif action == 'deactivate_user':
+            toggle_iu_active(instagram_user_username, False)
+        updated_user = get_instagram_user_by_username(instagram_user_username)
+
+        bot.send_photo(chat_id=call.message.chat.id, photo=updated_user.profile_pic_location,
+                       reply_markup=iu_i_menu_markup(updated_user),
+                       caption=caption_for_interactive_menu(updated_user))
+
+
+def ius_list(call: CallbackQuery, bot: TeleBot):
+    bot.delete_message(call.message.chat.id, call.message.message_id)
+    bot.send_message(call.message.chat.id, 'Your instagram users',
+                     reply_markup=user_instagram_users_markup(call.message.chat.id, 1))
+
+
+def iu_i_menu(call: CallbackQuery, bot: TeleBot):
+    instagram_user_username = call.data.partition('instagram_user_interactive_menu:')[2]
+    instagram_user = get_instagram_user_by_username(instagram_user_username)
+    bot.delete_message(call.message.chat.id, call.message.message_id)
+    bot.send_photo(chat_id=call.message.chat.id, photo=instagram_user.profile_pic_location,
+                   reply_markup=iu_i_menu_markup(instagram_user), caption=caption_for_interactive_menu(instagram_user))
+
+
+def iu_i_page(call: CallbackQuery, bot: TeleBot):
+    data = call.data.partition('iu_i_page_markup:')[2]
+    select = data.split('/')
+    page = select[0]
+    target = select[1]
+    instagram_user_username = select[2]
+    instagram_user = get_instagram_user_by_username(instagram_user_username)
+    if target == 'highlights' and instagram_user.highlights.select().count() > 0:
+        highlight = get_iu_highlights_by_page(instagram_user, int(page))
+        resend_file(highlight.telegram_file_id, bot, call.message,
+                    reply_markup=iu_i_page_markup(instagram_user, target, int(page)))
+    elif target == 'stories' and instagram_user.stories.select().count() > 0:
+        story = get_iu_stories_by_page(instagram_user, int(page))
+        resend_file(story.telegram_file_id, bot, call.message,
+                    reply_markup=iu_i_page_markup(instagram_user, target, int(page)))
 
 
 def user_instagram_users(call: CallbackQuery, bot: TeleBot):
@@ -49,35 +75,6 @@ def user_add_instagram_user(call: CallbackQuery, bot: TeleBot):
     msg = bot.edit_message_text('Write target username or paste profile url', call.message.chat.id,
                                 call.message.message_id)
     bot.register_next_step_handler(msg, instagram_process_add_user_instagram_user, call, bot)
-
-
-def user_select_instagram_user(call: CallbackQuery, bot: TeleBot):
-    selected_instagram_user = call.data.partition('user_select_instagram_user:')[2]
-    instagram_user = select_instagram_user(selected_instagram_user, call.message.chat.id)
-    bot.edit_message_text(f'Selected: {instagram_user.username}', call.message.chat.id,
-                          call.message.message_id,
-                          reply_markup=user_selected_instagram_user_markup(instagram_user))
-
-
-def user_instagram_user_change_active(call: CallbackQuery, bot: TeleBot):
-    instagram_user = toggle_selected_active_instagram_user(call.from_user.id)
-    bot.edit_message_text(f'Selected: {instagram_user.username}',
-                          call.message.chat.id, call.message.message_id,
-                          reply_markup=user_selected_instagram_user_markup(instagram_user))
-
-
-def user_instagram_user_get(call: CallbackQuery, bot: TeleBot):
-    target_for_get = call.data.partition('user_instagram_user_get:')[2]
-    target_instagram_user = get_selected_instagram_user(call.message.chat.id)
-    bot.edit_message_text(f'Start collecting', call.message.chat.id, call.message.message_id)
-    get_media(bot, call.message, target_instagram_user, target_for_get)
-
-
-def user_instagram_user_get_sent(call: CallbackQuery, bot: TeleBot):
-    target_for_get = call.data.partition('user_instagram_user_get_sent:')[2]
-    target_instagram_user = get_selected_instagram_user(call.message.chat.id)
-    bot.edit_message_text(f'Start collecting', call.message.chat.id, call.message.message_id)
-    get_sent_files(bot, call.message, target_instagram_user, target_for_get)
 
 
 # Default next step handlers

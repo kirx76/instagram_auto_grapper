@@ -5,8 +5,9 @@ import requests
 
 from database.database import InstagramAccount, InstagramStory, InstagramPostResource, InstagramPost, InstagramUser, \
     TelegramUser, InstagramHighlight
-from database.get import get_current_telegram_user, get_selected_instagram_user, get_selected_instagram_account, \
-    get_active_instagram_account_by_telegram_user_id
+from database.get import get_current_telegram_user, get_selected_instagram_account, \
+    get_active_instagram_account_by_telegram_user_id, get_instagram_user_by_username, \
+    check_telegram_user_in_instagram_user
 from utils.misc import dbm, initialize_valid_instagram_account, caption_text_to_db, AWS, \
     create_folder_by_username
 
@@ -92,12 +93,11 @@ def toggle_selected_active_instagram_account(user_id):
     return get_selected_instagram_account(user_id)
 
 
-def toggle_selected_active_instagram_user(user_id):
-    isub = get_selected_instagram_user(user_id)
+def toggle_iu_active(instagram_user_username: str, state: bool):
+    iu = get_instagram_user_by_username(instagram_user_username)
     dbm('Toggled selected instagram user activity')
-    isub.enabled = False if isub.enabled else True
-    isub.save()
-    return isub
+    iu.enabled = state
+    iu.save()
 
 
 def add_instagram_post_to_instagram_user(post: InstagramPost, telegram_user_id, files) -> InstagramPost:
@@ -154,9 +154,16 @@ def create_or_get_instagram_user(instagram_user: InstagramUser, telegram_user: T
             enabled=True,
         )
         dbm(f'Instagram user {instagram_user.username} added by {telegram_user.username}')
+        created_user.available_for.add(TelegramUser.get(TelegramUser.user_id == telegram_user.user_id))
         return created_user
     else:
-        dbm(f'Instagram user {instagram_user.username} for {telegram_user.username} already exists')
+        is_telegram_user_added_to_instagram_user = check_telegram_user_in_instagram_user(exists_instagram_user,
+                                                                                         telegram_user)
+        if is_telegram_user_added_to_instagram_user:
+            dbm(f'Instagram user {instagram_user.username} for {telegram_user.username} already exists')
+        else:
+            exists_instagram_user.available_for.add(TelegramUser.get(TelegramUser.user_id == telegram_user.user_id))
+            dbm(f'Instagram user {instagram_user.username} added to {telegram_user.username}')
         return exists_instagram_user
 
 

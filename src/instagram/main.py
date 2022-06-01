@@ -7,10 +7,8 @@ from telebot import TeleBot
 from telebot.types import InputMediaPhoto, InputMediaVideo
 
 from bot.main import default_downloader_thread_starter
-from bot.markups.markups import user_selected_instagram_user_markup
-from database.get import get_telegram_user_active_instagram_account, get_instagram_posts_with_file_id_by_instagram_user, \
-    get_instagram_stories_with_file_id_by_instagram_user, get_instagram_highlights_with_file_id_by_instagram_user, \
-    get_instagram_post_resources_with_file_id_by_instagram_post
+from bot.markups.markups import iu_i_menu_markup
+from database.get import get_telegram_user_active_instagram_account
 from database.set import save_instagram_account_dump_data
 from instagram.instances.highlight import get_new_highlights, grap_highlights
 from instagram.instances.post import get_new_posts, grap_posts
@@ -23,75 +21,23 @@ TG_BOT_API_URL = os.environ.get("TG_BOT_API_URL")
 TG_BOT_TOKEN = os.environ.get("TG_BOT_TOKEN")
 
 
-def send_file(file_id, bot: TeleBot, message):
+def resend_file(file_id, bot: TeleBot, message, reply_markup=None):
     time.sleep(1)
     file_url = bot.get_file_url(file_id)
     if 'videos' in file_url:
-        bot.send_video(message.chat.id, video=file_id)
+        bot.edit_message_media(media=InputMediaVideo(file_id), chat_id=message.chat.id,
+                               message_id=message.message_id, reply_markup=reply_markup)
     elif 'photos' in file_url:
-        bot.send_photo(message.chat.id, photo=file_id)
+        bot.edit_message_media(media=InputMediaPhoto(file_id), chat_id=message.chat.id,
+                               message_id=message.message_id, reply_markup=reply_markup)
     else:
         mt = mimetypes.guess_type(file_url)
         if mt[0] == 'video/mp4':
-            bot.send_video(message.chat.id, video=file_id)
+            bot.edit_message_media(media=InputMediaVideo(file_id), chat_id=message.chat.id,
+                                   message_id=message.message_id, reply_markup=reply_markup)
         else:
-            bot.send_photo(message.chat.id, photo=file_id)
-
-
-def get_sent_files(bot: TeleBot, message, instagram_user, target):
-    try:
-        inst(f'Current target for sent files: {instagram_user.username}')
-
-        if target == 'posts':
-            posts = get_instagram_posts_with_file_id_by_instagram_user(instagram_user)
-            for post in posts:
-                try:
-                    if post.telegram_file_id is not None:
-                        send_file(post.telegram_file_id, bot, message)
-                    else:
-                        time.sleep(1)
-                        data = []
-                        resource_list = get_instagram_post_resources_with_file_id_by_instagram_post(post)
-                        for resource in resource_list:
-                            file_url = bot.get_file_url(resource.telegram_file_id)
-                            if 'videos' in file_url:
-                                data.append(InputMediaVideo(resource.telegram_file_id))
-                            elif 'photos' in file_url:
-                                data.append(InputMediaPhoto(resource.telegram_file_id))
-                            else:
-                                mt = mimetypes.guess_type(file_url)
-                                if mt[0] == 'video/mp4':
-                                    data.append(InputMediaVideo(resource.telegram_file_id))
-                                else:
-                                    data.append(InputMediaPhoto(resource.telegram_file_id))
-                        bot.send_media_group(message.chat.id, data)
-                except Exception as e:
-                    err(f'{post}{e}')
-                    pass
-
-        if target == 'stories':
-            stories = get_instagram_stories_with_file_id_by_instagram_user(instagram_user)
-            for story in stories:
-                try:
-                    send_file(story.telegram_file_id, bot, message)
-                except Exception as e:
-                    err(f'{story}{e}')
-                    pass
-
-        if target == 'highlights':
-            highlights = get_instagram_highlights_with_file_id_by_instagram_user(instagram_user)
-            for highlight in highlights:
-                try:
-                    send_file(highlight.telegram_file_id, bot, message)
-                except Exception as e:
-                    err(f'{highlight}{e}')
-                    pass
-
-        bot.send_message(message.chat.id, 'Done', reply_markup=user_selected_instagram_user_markup(instagram_user))
-
-    except Exception as e:
-        err(e)
-        bot.send_message(message.chat.id, e)
+            bot.edit_message_media(media=InputMediaPhoto(file_id), chat_id=message.chat.id,
+                                   message_id=message.message_id, reply_markup=reply_markup)
 
 
 def get_media(bot: TeleBot, message, instagram_user, target):
@@ -107,8 +53,12 @@ def get_media(bot: TeleBot, message, instagram_user, target):
                 default_downloader_thread_starter(grap_posts, bot, message, instagram_user, valid_instagram_account,
                                                   pks=new_posts)
             else:
-                bot.edit_message_text('No new posts', message.chat.id, message.message_id,
-                                      reply_markup=user_selected_instagram_user_markup(instagram_user))
+                bot.delete_message(message.chat.id, message.message_id)
+                bot.send_photo(chat_id=message.chat.id, photo=instagram_user.profile_pic_location,
+                               reply_markup=iu_i_menu_markup(instagram_user),
+                               caption='No new posts')
+                # bot.edit_message_text('No new posts', message.chat.id, message.message_id,
+                #                       reply_markup=iu_i_menu_markup(instagram_user))
 
         if target == 'stories':
             new_stories = get_new_stories(instagram_user, valid_instagram_account)
@@ -116,8 +66,10 @@ def get_media(bot: TeleBot, message, instagram_user, target):
                 default_downloader_thread_starter(grap_stories, bot, message, instagram_user, valid_instagram_account,
                                                   pks=new_stories)
             else:
-                bot.edit_message_text('No new stories', message.chat.id, message.message_id,
-                                      reply_markup=user_selected_instagram_user_markup(instagram_user))
+                bot.delete_message(message.chat.id, message.message_id)
+                bot.send_photo(chat_id=message.chat.id, photo=instagram_user.profile_pic_location,
+                               reply_markup=iu_i_menu_markup(instagram_user),
+                               caption='No new stories')
 
         if target == 'highlights':
             new_highlights = get_new_highlights(instagram_user, valid_instagram_account)
@@ -126,8 +78,12 @@ def get_media(bot: TeleBot, message, instagram_user, target):
                                                   valid_instagram_account,
                                                   pks=new_highlights)
             else:
-                bot.edit_message_text('No new highlights', message.chat.id, message.message_id,
-                                      reply_markup=user_selected_instagram_user_markup(instagram_user))
+                bot.delete_message(message.chat.id, message.message_id)
+                bot.send_photo(chat_id=message.chat.id, photo=instagram_user.profile_pic_location,
+                               reply_markup=iu_i_menu_markup(instagram_user),
+                               caption='No new highlights')
+                # bot.edit_message_text('No new highlights', message.chat.id, message.message_id,
+                #                       reply_markup=iu_i_menu_markup(instagram_user))
     except Exception as e:
         err(e)
         bot.send_message(message.chat.id, e)

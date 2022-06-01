@@ -2,7 +2,7 @@ import time
 
 from instagrapi.exceptions import PleaseWaitFewMinutes
 
-from bot.markups.markups import user_selected_instagram_user_markup
+from bot.markups.markups import iu_i_menu_markup
 from database.database import InstagramPost
 from database.set import add_instagram_post_to_instagram_user
 from instagram.downloads import download_and_send_photo, download_and_send_video, download_and_send_album
@@ -25,7 +25,7 @@ def grap_posts(bot, message, instagram_user, cl, pks):
         inst(f'Grepping {BColors.OKCYAN}posts{BColors.ENDC} complete')
         bot.send_message(message.chat.id,
                          f'Collection complete\n\nSelected: {instagram_user.username}',
-                         reply_markup=user_selected_instagram_user_markup(instagram_user))
+                         reply_markup=iu_i_menu_markup(instagram_user))
     except PleaseWaitFewMinutes as e:
         err(e)
         oss('Sleep 300 s')
