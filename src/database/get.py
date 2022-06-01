@@ -40,8 +40,7 @@ def get_telegram_user_instagram_users_paginated(user_id, page) -> list[Instagram
     telegram_user = get_current_telegram_user(user_id)
     dbm('Getting telegram user instagram users')
     return InstagramUser.select().join(TelegramUserInstagramUsers).where(
-        (TelegramUserInstagramUsers.telegramuser_id == telegram_user) | (
-                InstagramUser.added_by == telegram_user.id)).order_by(
+        TelegramUserInstagramUsers.telegramuser_id == telegram_user).order_by(
         InstagramUser.username).paginate(
         page, 5).execute()
 
