@@ -55,6 +55,17 @@ def check_telegram_user_in_instagram_user(instagram_user, telegram_user):
         return True
 
 
+def check_if_tg_user_have_active_and_valid_ic(tg_user_id) -> bool:
+    ic = InstagramAccount.select().join(TelegramUser).where(
+        (InstagramAccount.is_active == True) & (InstagramAccount.is_valid == True) & (
+                TelegramUser.user_id == tg_user_id)
+    ).first()
+    if ic is not None:
+        return True
+    else:
+        return False
+
+
 def get_telegram_user_instagram_users(user_id) -> list[InstagramUser]:
     telegram_user = get_current_telegram_user(user_id)
     dbm('Getting telegram user instagram users')

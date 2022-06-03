@@ -20,7 +20,8 @@ def grap_stories(bot, message, instagram_user, cl, pks):
         inst(f'Founded {len(pks)} {BColors.OKCYAN}stories{BColors.ENDC}')
         if len(pks) > 0:
             create_folder_by_username(instagram_user.username)
-            for story in pks:
+            for index, story in enumerate(pks):
+                inst(f'Story #{index + 1} of {len(pks)}')
                 download_story(bot, story, message, instagram_user, cl)
 
         inst(f'Grepping {BColors.OKCYAN}stories{BColors.ENDC} complete')

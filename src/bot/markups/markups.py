@@ -5,7 +5,7 @@ from telegram_bot_pagination import InlineKeyboardPaginator
 
 from database.get import get_current_telegram_user, get_instagram_accounts_by_telegram_user_id, \
     get_telegram_user_instagram_users, get_telegram_user_instagram_users_paginated, get_iu_highlights_count, \
-    get_iu_stories_count, get_iu_posts_count
+    get_iu_stories_count, get_iu_posts_count, check_if_tg_user_have_active_and_valid_ic
 
 TEXTS = {
 }
@@ -14,8 +14,8 @@ TEXTS = {
 def main_menu_markup(telegram_user_id):
     markup = InlineKeyboardMarkup()
     markup.add(InlineKeyboardButton("Instagram accounts", callback_data='user_instagram_accounts'))
-    telegram_user_instagram_users_all = get_telegram_user_instagram_users(telegram_user_id)
-    if len(telegram_user_instagram_users_all) > 0:
+    telegram_user_have_active_ic = check_if_tg_user_have_active_and_valid_ic(telegram_user_id)
+    if telegram_user_have_active_ic:
         markup.add(InlineKeyboardButton("Instagram users", callback_data='user_instagram_users'))
     return markup
 

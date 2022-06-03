@@ -15,8 +15,12 @@ PG_USER = os.environ.get("PG_USER")
 PG_USER_PASSWORD = os.environ.get("PG_USER_PASSWORD")
 PG_HOST = os.environ.get("PG_HOST")
 PG_PORT = os.environ.get("PG_PORT")
+DEBUG = os.environ.get("DEBUG")
 
-db = PostgresqlExtDatabase(PG_APP_NAME, user=PG_USER, password=PG_USER_PASSWORD, host=PG_HOST, port=PG_PORT,
+if DEBUG == 'True':
+    db = SqliteDatabase('debug.db')
+else:
+    db = PostgresqlExtDatabase(PG_APP_NAME, user=PG_USER, password=PG_USER_PASSWORD, host=PG_HOST, port=PG_PORT,
                            autocommit=True,
                            thread_safe=True)
 

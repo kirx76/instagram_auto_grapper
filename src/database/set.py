@@ -173,12 +173,13 @@ def add_resource_to_instagram_post(resource: InstagramPostResource,
     exists_resource = InstagramPostResource.get_or_none(InstagramPostResource.pk == resource.pk)
     file_id = None
     bigger_file = files[current_index]
+    print('bigger_file', bigger_file)
     if hasattr(bigger_file, 'photo'):
         if bigger_file.photo is not None:
             file_id = bigger_file.photo[-1].file_id
     if hasattr(bigger_file, 'video'):
         if bigger_file.video is not None:
-            file_id = bigger_file.video[-1].file_id
+            file_id = bigger_file.video.file_id
     if exists_resource is None:
         created_resource, created = InstagramPostResource.get_or_create(
             pk=resource.pk,

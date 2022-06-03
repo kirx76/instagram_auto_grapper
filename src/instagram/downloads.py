@@ -15,7 +15,7 @@ def download_and_send_photo(bot: TeleBot, media, message, username, cl):
     sent = bot.send_photo(chat_id=message.chat.id, photo=open(downloaded_photo_path, 'rb'),
                           caption=collect_caption_to_send(media, username))
 
-    cleanup_downloaded_file_by_filepath(downloaded_photo_path)
+    # cleanup_downloaded_file_by_filepath(downloaded_photo_path)
     return True, sent.photo
 
 
@@ -74,7 +74,7 @@ def download_and_send_video(bot: TeleBot, video, message, username, cl):
     time.sleep(2)
     sent = bot.send_video(chat_id=message.chat.id, video=open(downloaded_video_path, 'rb'), supports_streaming=True,
                           caption=collect_caption_to_send(video, username))
-    cleanup_downloaded_file_by_filepath(downloaded_video_path)
+    # cleanup_downloaded_file_by_filepath(downloaded_video_path)
     return True, sent.video
 
 
@@ -90,10 +90,10 @@ def download_and_send_album(bot: TeleBot, album, message, username, cl):
     downloaded_photo_paths = cl.album_download(album.pk, folder=f'./downloads/{username}')
     data = []
     # TODO IF ALBUM HAVE A VIDEO -> SENDS THUMBNAIL OF VIDEO NOT VIDEO
-    logger.debug(f'[DEBUG]: {downloaded_photo_paths}')
-    logger.debug(f'[ALUBUMM]: {album}')
+    # logger.debug(f'[DEBUG]: {downloaded_photo_paths}')
+    # logger.debug(f'[ALUBUMM]: {album}')
     for i, source in enumerate(downloaded_photo_paths):
-        logger.debug(f'[SURSA]: {source}')
+        # logger.debug(f'[SURSA]: {source}')
         mt = mimetypes.guess_type(source)
 
         if i == 0:
@@ -106,8 +106,10 @@ def download_and_send_album(bot: TeleBot, album, message, username, cl):
                 data.append(InputMediaVideo(open(source, 'rb')))
             else:
                 data.append(InputMediaPhoto(open(source, 'rb')))
-    time.sleep(2)
     sent = bot.send_media_group(message.chat.id, data)
-    for source in downloaded_photo_paths:
-        cleanup_downloaded_file_by_filepath(source)
+    time.sleep(5)
+    # print('AFTER SENT ZAEBAL')
+    # for source in downloaded_photo_paths:
+    #     cleanup_downloaded_file_by_filepath(source)
+    # print("AFTER CLEANUP HULI")
     return True, sent

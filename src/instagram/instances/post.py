@@ -6,7 +6,7 @@ from bot.markups.markups import iu_i_menu_markup
 from database.database import InstagramPost
 from database.set import add_instagram_post_to_instagram_user
 from instagram.downloads import download_and_send_photo, download_and_send_video, download_and_send_album
-from utils.misc import BColors, divider, create_folder_by_username, inst, err, oss
+from utils.misc import BColors, divider, create_folder_by_username, inst, err, oss, cleanup_folder
 
 
 def grap_posts(bot, message, instagram_user, cl, pks):
@@ -19,7 +19,8 @@ def grap_posts(bot, message, instagram_user, cl, pks):
         inst(f'Founded {len(pks)} {BColors.OKCYAN}posts{BColors.ENDC}')
         if len(pks) > 0:
             create_folder_by_username(instagram_user.username)
-            for post in pks:
+            for index, post in enumerate(pks):
+                inst(f'Post #{index + 1} of {len(pks)}')
                 download_post(bot, post, message, instagram_user, cl)
 
         inst(f'Grepping {BColors.OKCYAN}posts{BColors.ENDC} complete')
@@ -49,6 +50,7 @@ def download_post(bot, post, message, instagram_user, cl):
         sent, files = download_and_send_album(bot, post, message, instagram_user.username, cl)
     if sent:
         add_instagram_post_to_instagram_user(post, message.chat.id, files)
+        cleanup_folder(instagram_user.username)
 
 
 def get_posts_list(username, instagram_client):

@@ -101,6 +101,11 @@ def divider():
     print(f'{BColors.OKCYAN}{"=" * 50}{BColors.ENDC}')
 
 
+def cleanup_folder(username):
+    cleanup_folder_by_username(username)
+    create_folder_by_username(username)
+
+
 def cleanup_downloaded_file_by_filepath(path):
     oss('Remove file by filepath')
     try:
@@ -162,7 +167,7 @@ def caption_for_interactive_menu(instagram_user):
 username: <b>{instagram_user.username}</b>
 fullname: <b>{instagram_user.full_name}</b>
 enabled: <b>{"Yes" if instagram_user.enabled else "No"}</b>
-is_private: <b>{"Yes" if instagram_user.is_private else "No"}</b>
+is_private: <b>{"No" if instagram_user.is_private == 'False' else "Yes"}</b>
 added_by: <b>{instagram_user.added_by.username}</b>
 added_at: <b>{instagram_user.added_at.strftime("%Y-%m-%d %H:%M:%S")}</b>
 '''

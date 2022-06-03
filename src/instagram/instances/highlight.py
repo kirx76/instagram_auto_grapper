@@ -19,7 +19,8 @@ def grap_highlights(bot, message, instagram_user, cl, pks):
         inst(f'Founded {len(pks)} {BColors.OKCYAN}highlights{BColors.ENDC}')
         if len(pks) > 0:
             create_folder_by_username(instagram_user.username)
-            for highlight in pks:
+            for index, highlight in enumerate(pks):
+                inst(f'Highlight #{index + 1} of {len(pks)}')
                 download_highlight(bot, highlight, message, instagram_user, cl)
 
         inst(f'Grepping {BColors.OKCYAN}highlights{BColors.ENDC} complete')

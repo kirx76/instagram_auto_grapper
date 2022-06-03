@@ -13,3 +13,4 @@ venv
 /src/logs.txt
 /src/logs_debug.txt
 /blank.py
+/src/debug.db
