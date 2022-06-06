@@ -4,7 +4,7 @@ from telebot.types import CallbackQuery, Message
 from bot.markups.markups import user_instagram_accounts_markup, user_selected_instagram_account_markup
 from database.get import select_instagram_account, get_selected_instagram_account
 from database.set import delete_selected_instagram_account, toggle_selected_active_instagram_account, \
-    set_selected_instagram_account_validity, add_instagram_account, save_instagram_account_dump_data
+    set_selected_instagram_account_validity, add_instagram_account, save_iaccount_dump_data
 from utils.misc import check_instagram_account_validity
 
 
@@ -48,7 +48,7 @@ def user_instagram_account_change_active(call: CallbackQuery, bot: TeleBot):
 
 def user_instagram_account_check_status(call: CallbackQuery, bot: TeleBot):
     selected = get_selected_instagram_account(call.from_user.id)
-    is_valid = check_instagram_account_validity(selected, bot, call.message.chat.id, save_instagram_account_dump_data)
+    is_valid = check_instagram_account_validity(selected, bot, call.message.chat.id, save_iaccount_dump_data)
     updated = set_selected_instagram_account_validity(call.from_user.id, is_valid)
     bot.edit_message_text(
         f'Selected {updated.username}\n'

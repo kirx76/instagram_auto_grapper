@@ -9,7 +9,7 @@ from telebot.types import InputMediaPhoto, InputMediaVideo
 from bot.main import default_downloader_thread_starter
 from bot.markups.markups import iu_i_menu_markup
 from database.get import get_telegram_user_active_instagram_account
-from database.set import save_instagram_account_dump_data
+from database.set import save_iaccount_dump_data
 from instagram.instances.highlight import get_new_highlights, grap_highlights
 from instagram.instances.post import get_new_posts, grap_posts
 from instagram.instances.story import get_new_stories, grap_stories
@@ -45,7 +45,7 @@ def get_media(bot: TeleBot, message, instagram_user, target):
         inst(f'Current target: {instagram_user.username}')
         active_instagram_account = get_telegram_user_active_instagram_account(message.chat.id)
         valid_instagram_account = initialize_valid_instagram_account(active_instagram_account, bot, message.chat.id,
-                                                                     save_instagram_account_dump_data)
+                                                                     save_iaccount_dump_data)
 
         if target == 'posts':
             new_posts = get_new_posts(instagram_user, valid_instagram_account)

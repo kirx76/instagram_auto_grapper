@@ -10,7 +10,7 @@ from bot.markups.markups import main_menu_markup, user_instagram_users_markup
 from database.get import get_current_telegram_user, get_telegram_user_active_instagram_account, \
     get_enabled_instagram_users, get_telegram_user_by_instagram_user_username, \
     get_active_instagram_account_by_instagram_user
-from database.set import create_db_telegram_user, save_instagram_account_dump_data
+from database.set import create_db_telegram_user, save_iaccount_dump_data
 from instagram.instances.highlight import get_new_highlights, grap_highlights
 from instagram.instances.post import get_new_posts, grap_posts
 from instagram.instances.story import get_new_stories, grap_stories
@@ -172,7 +172,7 @@ def main_scheduler_thread(bot: TeleBot):
             err(f"Instagram user {user.username} don't have active Instagram account")
             return
         instagram_client = initialize_valid_instagram_account(instagram_user_active_instagram_account, bot,
-                                                              telegram_user.user_id, save_instagram_account_dump_data)
+                                                              telegram_user.user_id, save_iaccount_dump_data)
         downloader(user, instagram_client, bot, telegram_user)
 
 
