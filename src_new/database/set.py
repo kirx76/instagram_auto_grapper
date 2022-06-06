@@ -4,6 +4,7 @@ from instagrapi.types import User
 from telebot.types import Message
 
 from database.models import TUser, IAccount, IUser
+from utils.models.IUserModel import IUserModel
 
 
 def create_or_get_tuser(message: Message) -> TUser:
@@ -16,20 +17,6 @@ def create_or_get_iaccount(username: str, password: str, tuser: TUser) -> (IAcco
     iaccount, created = IAccount.get_or_create(username=username, password=password, owner=tuser.id)
     print('create_or_get_iaccount', created)
     return iaccount, created
-
-
-def create_or_get_iuser(iuser: User, tuser: TUser):
-    iuser, created = IUser.get_or_create(
-        pk=iuser.pk,
-        username=iuser.username,
-        full_name=iuser.full_name,
-        profile_pic_url=iuser.profile_pic_url,
-        profile_pic_url_hd=iuser.profile_pic_url_hd,
-        is_private=iuser.is_private,
-        added_by=tuser.id,
-        profile_pic_location=telegram_file_id,
-        enabled=True,
-    )
 
 
 def save_iaccount_dump_data(path: str, iaccount: IAccount):

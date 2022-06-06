@@ -20,6 +20,7 @@ def user_iaccounts_menu_markup(tuser: TUser):
     iaccounts = get_iaccounts_list(tuser)
     for iaccount in iaccounts:
         markup.add(InlineKeyboardButton(iaccount.username, callback_data=f'user_iaccount_menu:{iaccount.username}'))
+    markup.add(InlineKeyboardButton('Back', callback_data=f'user_main_menu'))
     return markup
 
 
@@ -39,3 +40,10 @@ def user_iusers_menu_markup(tuser: TUser):
         markup.add(InlineKeyboardButton(iuser.username, callback_data=f'user_iuser_menu:{iuser.username}'))
 
     return markup
+
+
+# def user_iuser_accept():
+#     markup = InlineKeyboardMarkup()
+#     markup.add(InlineKeyboardButton('Yes', callback_data=f'user_iuser_accept'))
+#
+#     return markup

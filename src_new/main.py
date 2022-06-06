@@ -1,13 +1,14 @@
 from telebot import apihelper
 
 from bot.functions import send_start, user_iaccounts, user_add_iaccount, user_iaccount_menu, \
-    user_selected_iaccount_menu, user_iusers, user_add_iuser
+    user_selected_iaccount_menu, user_iusers, user_add_iuser, user_main_menu
 from bot.main import initialize_bot
 from database.functions import initialize_db
 
 
 def register_main_handlers():
     bot.register_message_handler(send_start, commands=['start'], pass_bot=True)
+    bot.register_callback_query_handler(user_main_menu, func=lambda call: call.data == 'user_main_menu', pass_bot=True)
 
 
 def register_iaccount_handlers():
@@ -20,7 +21,6 @@ def register_iaccount_handlers():
 def register_iuser_handlers():
     bot.register_callback_query_handler(user_iusers, func=lambda call: call.data == 'user_iusers', pass_bot=True)
     bot.register_callback_query_handler(user_add_iuser, func=lambda call: call.data == 'user_add_iuser', pass_bot=True)
-
 
 
 def main():

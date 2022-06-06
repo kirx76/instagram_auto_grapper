@@ -3,16 +3,22 @@ from telebot.types import Message, CallbackQuery
 
 from bot.markups.user_markup import user_main_menu_markup, user_iaccounts_menu_markup, \
     user_selected_iaccount_menu_markup, user_iusers_menu_markup
-from database.get import get_iaccount_by_username, get_tuser
-from database.set import create_or_get_tuser, create_or_get_iaccount, create_or_get_iuser
-from instagram.main import check_iaccount_validity, check_iuser_validity
+from database.get import get_iaccount_by_username, get_tuser, get_tuser_iaccount
+from database.set import create_or_get_tuser, create_or_get_iaccount
+from instagram.main import check_iaccount_validity
 from utils.bot_edit_message_text import bemt
 from utils.get_instagram_username import get_instagram_username
+from utils.models.IUserModel import IUserModel
 
 
 def send_start(message: Message, bot: TeleBot):
     user = create_or_get_tuser(message)
     bot.send_message(message.chat.id, f'Welcome, {user.username}', reply_markup=user_main_menu_markup(user))
+
+
+def user_main_menu(call: CallbackQuery, bot: TeleBot):
+    user = get_tuser(call.from_user.id)
+    bemt(bot, call.message, f'Welcome, {user.username}', reply_markup=user_main_menu_markup(user))
 
 
 def user_iaccounts(call: CallbackQuery, bot: TeleBot):
@@ -57,9 +63,18 @@ def add_iuser_process_username(message: Message, call: CallbackQuery, bot: TeleB
     iuser_username = get_instagram_username(message.text)
     tuser = get_tuser(call.from_user.id)
     bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
-    is_iuser_valid, iuser_data = check_iuser_validity(tuser, iuser_username)
-    print('is_iuser_valid', is_iuser_valid)
-    create_or_get_iuser(iuser_data, tuser)
+    iaccount = get_tuser_iaccount(tuser)
+    iuser_model = IUserModel(iuser_username, iaccount)
+    iuser_model.get_user_data()
+    # iuser_model.save_to_db(owner=tuser)
+
+    msg = iuser_model.send_profile_pic_to_user(bot, call.message)
+
+    iuser_model.save_to_db(owner=tuser)
+
+    # is_iuser_valid, iuser_data = check_iuser_validity(tuser, iuser_username)
+    # print('is_iuser_valid', is_iuser_valid)
+    # create_or_get_iuser(iuser_data, tuser)
     # add_instagram_user(target_username, call.message.chat.id, bot, call.message.chat.id)
     # bot.edit_message_text('Your instagram users', call.message.chat.id, call.message.message_id,
     #                       reply_markup=user_instagram_users_markup(call.message.chat.id, 1))
