@@ -4,7 +4,7 @@ from instagrapi.types import User
 from telebot import TeleBot
 from telebot.types import Message
 
-from bot.markups.user_markup import user_iuser_accept
+from database.get import check_tuser_in_iuser
 from database.models import IAccount, IUser, TUser
 from utils.get_bigger_file import get_bigger_photo
 from utils.models.IAccountModel import IAccountModel
@@ -47,7 +47,13 @@ class IUserModel:
             created_user.available_for.add(owner)
             return created_user
         else:
-
+            exists_iuser = IUser.get_or_none(IUser.pk == self.user_data.pk)
+            print('Exists')
+            is_tuser_exists_in_iuser = check_tuser_in_iuser(exists_iuser, owner)
+            if is_tuser_exists_in_iuser:
+                pass
+            else:
+                exists_iuser.available_for.add(owner)
 
     def get_user_data(self):
         try:

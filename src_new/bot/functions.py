@@ -6,7 +6,8 @@ from bot.markups.user_markup import user_main_menu_markup, user_iaccounts_menu_m
 from database.get import get_iaccount_by_username, get_tuser, get_tuser_iaccount
 from database.set import create_or_get_tuser, create_or_get_iaccount
 from instagram.main import check_iaccount_validity
-from utils.bot_edit_message_text import bemt
+from utils.bot_delete_message import bdm
+from utils.bot_edit_message import bemt, bemp
 from utils.get_instagram_username import get_instagram_username
 from utils.models.IUserModel import IUserModel
 
@@ -59,7 +60,7 @@ def user_add_iuser(call: CallbackQuery, bot: TeleBot):
 
 
 def add_iuser_process_username(message: Message, call: CallbackQuery, bot: TeleBot):
-    bot.edit_message_text('Wait for check instagram user info', call.message.chat.id, call.message.message_id)
+    msg1 = bot.edit_message_text('Wait for check instagram user info', call.message.chat.id, call.message.message_id)
     iuser_username = get_instagram_username(message.text)
     tuser = get_tuser(call.from_user.id)
     bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
@@ -67,11 +68,12 @@ def add_iuser_process_username(message: Message, call: CallbackQuery, bot: TeleB
     iuser_model = IUserModel(iuser_username, iaccount)
     iuser_model.get_user_data()
     # iuser_model.save_to_db(owner=tuser)
-
+    bdm(bot, msg1)
     msg = iuser_model.send_profile_pic_to_user(bot, call.message)
 
     iuser_model.save_to_db(owner=tuser)
 
+    bemp(bot, msg, iuser_model.biggest_photo_id, 'User added')
     # is_iuser_valid, iuser_data = check_iuser_validity(tuser, iuser_username)
     # print('is_iuser_valid', is_iuser_valid)
     # create_or_get_iuser(iuser_data, tuser)

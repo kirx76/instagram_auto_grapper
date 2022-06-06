@@ -1,4 +1,4 @@
-from database.models import TUser, IAccount, IUser
+from database.models import TUser, IAccount, IUser, TUserIUsers
 
 
 def get_iaccounts_list(tuser: TUser) -> list[IAccount]:
@@ -19,3 +19,11 @@ def get_iusers_list(tuser: TUser) -> list[IUser]:
 
 def get_tuser_iaccount(tuser: TUser) -> IAccount:
     return tuser.i_accounts.first()
+
+
+def check_tuser_in_iuser(iuser: IUser, tuser: TUser):
+    iuser_available_for = iuser.available_for.where(TUserIUsers.tuser_id == tuser.id).first()
+    if iuser_available_for is None:
+        return False
+    else:
+        return True
