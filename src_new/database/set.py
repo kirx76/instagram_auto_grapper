@@ -1,10 +1,8 @@
 import os
 
-from instagrapi.types import User
 from telebot.types import Message
 
-from database.models import TUser, IAccount, IUser
-from utils.models.IUserModel import IUserModel
+from database.models import TUser, IAccount
 
 
 def create_or_get_tuser(message: Message) -> TUser:
@@ -27,4 +25,3 @@ def save_iaccount_dump_data(path: str, iaccount: IAccount):
         IAccount.update({IAccount.dump_data: data}).where(
             IAccount.username == iaccount.username).execute()
         os.remove(path)
-

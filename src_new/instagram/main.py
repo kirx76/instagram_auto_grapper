@@ -3,22 +3,13 @@ from typing import Union
 
 from dotenv import load_dotenv
 from instagrapi import Client
+from telebot import TeleBot
 
-from database.get import get_tuser_iaccount
-from database.models import IAccount, TUser
+from database.models import IAccount, IUser
 from database.set import save_iaccount_dump_data
-from utils.models.IAccountModel import IAccountModel
+from utils.models.IUserModel import IUserModel
 
 load_dotenv()
-
-
-# def check_iuser_validity(tuser: TUser, iuser_username: str) -> tuple[bool, str]:
-#     iaccount = get_tuser_iaccount(tuser)
-#     cl = IAccountModel(iaccount)
-#     cl.login()
-#     is_valid, iuser_data = cl.get_iuser_data(iuser_username)
-#     print('is_valid', is_valid)
-#     return is_valid, iuser_data
 
 
 def check_iaccount_validity(username: str, password: str) -> Union[bool, tuple[bool, Union[Exception, str]]]:
@@ -51,3 +42,11 @@ def init_iaccount(iaccount: IAccount):
     except Exception as e:
         print(e)
         return False
+
+
+def get_media(bot: TeleBot, message, iuser_model: IUserModel, action: str):
+    try:
+        print(f'Current target: {iuser_model.iuser_username}')
+        pass
+    except Exception as e:
+        print(e)

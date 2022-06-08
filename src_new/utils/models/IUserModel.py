@@ -12,6 +12,7 @@ from utils.models.IAccountModel import IAccountModel
 
 class IUserModel:
     def __init__(self, iuser_username: str, iaccount: IAccount):
+        self.iuser: Union[IUser, None] = None
         self.iuser_username = iuser_username
         self.user_data: Union[User, None] = None
         self.biggest_photo_id: Union[str, None] = None
@@ -29,6 +30,10 @@ class IUserModel:
             return True
         else:
             return False
+
+    def get_user_from_db(self):
+        self.iuser = IUser.get(IUser.username == self.iuser_username)
+        return self.iuser
 
     def save_to_db(self, owner: TUser = None):
         exists = self.check_if_exists_db()
@@ -48,7 +53,6 @@ class IUserModel:
             return created_user
         else:
             exists_iuser = IUser.get_or_none(IUser.pk == self.user_data.pk)
-            print('Exists')
             is_tuser_exists_in_iuser = check_tuser_in_iuser(exists_iuser, owner)
             if is_tuser_exists_in_iuser:
                 pass
@@ -78,3 +82,34 @@ class IUserModel:
         biggest_photo = get_bigger_photo(msg.photo)
         self.biggest_photo_id = biggest_photo.file_id
         return msg
+
+    def get_posts_list(self):
+        try:
+            self.log()
+            user_id = int(self.iaccount.cl.user_id_from_username(self.iuser.username))
+            return self.iaccount.cl.user_medias(user_id)
+        except Exception as e:
+            print(e)
+
+    def log(self):
+        if not self.iaccount.logined:
+            self.iaccount.login()
+        if not self.iuser:
+            self.get_user_from_db()
+
+    def get_new_posts(self):
+        self.log()
+        posts = self.get_posts_list()
+        posts_in_db = self.iuser.posts.execute()
+        iu_posts_pks = [int(y.pk) for y in posts_in_db]
+        posts_pks = [int(post.pk) for post in posts]
+        filtered_list_of_posts_pks = list(set(posts_pks) - set(iu_posts_pks))
+        done_posts = []
+        for pk in filtered_list_of_posts_pks:
+            done_posts += ([x for x in posts if int(x.pk) == pk])
+        return done_posts
+
+    def get_posts(self, bot: TeleBot, message: Message):
+        self.log()
+        new_posts = self.get_new_posts()
+        print(len(new_posts), new_posts)

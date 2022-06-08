@@ -1,7 +1,7 @@
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from database.get import get_iaccounts_list, get_iusers_list
-from database.models import TUser, IAccount
+from database.models import TUser, IAccount, IUser
 
 
 def user_main_menu_markup(tuser: TUser):
@@ -37,13 +37,16 @@ def user_iusers_menu_markup(tuser: TUser):
 
     iusers = get_iusers_list(tuser)
     for iuser in iusers:
-        markup.add(InlineKeyboardButton(iuser.username, callback_data=f'user_iuser_menu:{iuser.username}'))
+        markup.add(InlineKeyboardButton(iuser.username, callback_data=f'user_selected_iuser_menu:{iuser.username}'))
 
     return markup
 
 
-# def user_iuser_accept():
-#     markup = InlineKeyboardMarkup()
-#     markup.add(InlineKeyboardButton('Yes', callback_data=f'user_iuser_accept'))
-#
-#     return markup
+def user_selected_iuser_menu_markup(iuser: IUser):
+    markup = InlineKeyboardMarkup()
+    markup.add(InlineKeyboardButton('Posts', callback_data=f'user_action_selected_iuser:posts/{iuser.username}'))
+    markup.add(InlineKeyboardButton('Stories', callback_data=f'user_action_selected_iuser:stories/{iuser.username}'))
+    markup.add(InlineKeyboardButton('Highlights', callback_data=f'user_action_selected_iuser:highlights/{iuser.username}'))
+
+    markup.add(InlineKeyboardButton('Back', callback_data=f'user_iusers'))
+    return markup
